@@ -289,17 +289,33 @@ step_wrapper(config, __file__, handler)
 
 Every handler receives a `FlowContext` with runtime utilities:
 
+<Note>
+**Naming Conventions**: TypeScript uses camelCase (`traceId`, `pathParams`) while Python uses snake_case (`trace_id`, `path_params`). The examples below show both styles.
+</Note>
+
 <ResponseField name="emit" type="function">
   Emit events to the event bus.
 
+  **TypeScript:**
+  ```typescript
+  await emit({ topic: 'topic-name', data: { key: 'value' } })
+  ```
+
+  **Python:**
   ```python
   await ctx.emit("topic.name", {"key": "value"})
   ```
 </ResponseField>
 
-<ResponseField name="trace_id" type="string">
+<ResponseField name="traceId / trace_id" type="string">
   Distributed tracing identifier for correlating logs.
 
+  **TypeScript:**
+  ```typescript
+  logger.info(`[${traceId}] Processing request`)
+  ```
+
+  **Python:**
   ```python
   ctx.logger.info(f"[{ctx.trace_id}] Processing request")
   ```
@@ -308,15 +324,28 @@ Every handler receives a `FlowContext` with runtime utilities:
 <ResponseField name="state" type="InternalStateManager">
   Internal state management (uses `$$internal-state` stream).
 
+  **TypeScript:**
+  ```typescript
+  await state.set("config", "theme", "dark")
+  const theme = await state.get("config", "theme")
+  ```
+
+  **Python:**
   ```python
   await ctx.state.set("config", "theme", "dark")
   theme = await ctx.state.get("config", "theme")
   ```
 </ResponseField>
 
-<ResponseField name="streams" type="dict[str, Stream]">
+<ResponseField name="streams" type="Streams">
   Access to stream instances.
 
+  **TypeScript:**
+  ```typescript
+  await streams.todos.set("inbox", "item-1", { title: "Buy milk" })
+  ```
+
+  **Python:**
   ```python
   todo_stream = Stream("todos")
   await todo_stream.set("inbox", "item-1", {"title": "Buy milk"})
@@ -326,6 +355,13 @@ Every handler receives a `FlowContext` with runtime utilities:
 <ResponseField name="logger" type="Logger">
   Context-aware logger with trace ID.
 
+  **TypeScript:**
+  ```typescript
+  logger.info("Processing started")
+  logger.error("An error occurred")
+  ```
+
+  **Python:**
   ```python
   ctx.logger.info("Processing started")
   ctx.logger.error("An error occurred", exc_info=True)
