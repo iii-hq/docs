@@ -55,40 +55,38 @@ sequenceDiagram
 
 ### Registration Flow
 
-<Steps>
-  <Step title="Register Function">
-    First, register the function that will be invoked:
+**Step 1: Register Function**
 
-    ```typescript
-    bridge.registerFunction({
-      functionPath: 'users.create',
-      handler: async (data) => {
-        // Function logic
-        return { id: '123', ...data };
-      }
-    });
-    ```
-  </Step>
+First, register the function that will be invoked:
 
-  <Step title="Register Trigger">
-    Then, register a trigger that routes to that function:
+```typescript
+bridge.registerFunction({
+  functionPath: 'users.create',
+  handler: async (data) => {
+    // Function logic
+    return { id: '123', ...data };
+  }
+});
+```
 
-    ```typescript
-    bridge.registerTrigger({
-      triggerType: 'api',
-      functionPath: 'users.create',  // Must match registered function
-      config: {
-        api_path: '/users',
-        http_method: 'POST'
-      }
-    });
-    ```
-  </Step>
+**Step 2: Register Trigger**
 
-  <Step title="Trigger Active">
-    The engine sets up the trigger in the appropriate module. Now when an HTTP POST request comes to `/users`, the `users.create` function will be invoked.
-  </Step>
-</Steps>
+Then, register a trigger that routes to that function:
+
+```typescript
+bridge.registerTrigger({
+  triggerType: 'api',
+  functionPath: 'users.create',  // Must match registered function
+  config: {
+    api_path: '/users',
+    http_method: 'POST'
+  }
+});
+```
+
+**Step 3: Trigger Active**
+
+The engine sets up the trigger in the appropriate module. Now when an HTTP POST request comes to `/users`, the `users.create` function will be invoked.
 
 ## Trigger Configurations by Type
 
