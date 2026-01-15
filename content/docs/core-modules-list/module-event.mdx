@@ -80,7 +80,7 @@ This Module adds a new Trigger Type: `event`.
 ```typescript
 // Register a function to handle events
 bridge.registerFunction({
-  functionPath: 'events.onUserCreated',
+  function_path: 'events.onUserCreated',
   handler: async (data) => {
     console.log('User created:', data);
     // Process the event
@@ -89,8 +89,8 @@ bridge.registerFunction({
 
 // Subscribe to the 'user.created' topic
 bridge.registerTrigger({
-  triggerType: 'event',
-  functionPath: 'events.onUserCreated',
+  trigger_type: 'event',
+  function_path: 'events.onUserCreated',
   config: {
     subscribes: ['user.created'],
   },
@@ -98,7 +98,7 @@ bridge.registerTrigger({
 
 // Emit an event
 await bridge.invokeFunction({
-  functionPath: 'event.emit',
+  function_path: 'event.emit',
   data: {
     topic: 'user.created',
     data: { id: '123', email: 'user@example.com' },

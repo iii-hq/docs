@@ -262,7 +262,7 @@ await bridge.connect();
 
 // Register a function
 bridge.registerFunction({
-  functionPath: 'service.action',
+  function_path: 'service.action',
   handler: async (data) => {
     return { result: 'success' };
   },
@@ -271,8 +271,8 @@ bridge.registerFunction({
 
 // Register a trigger
 bridge.registerTrigger({
-  triggerType: 'api',
-  functionPath: 'service.action',
+  trigger_type: 'api',
+  function_path: 'service.action',
   config: {
     api_path: '/my-endpoint',
     http_method: 'POST'
@@ -576,7 +576,7 @@ const bridge = createBridge();
 
 // Register function
 bridge.registerFunction({
-  functionPath: 'users.create',
+  function_path: 'users.create',
   handler: async (data) => {
     const user = { id: '123', ...data };
     return { status: 201, body: user };
@@ -585,8 +585,8 @@ bridge.registerFunction({
 
 // Register API trigger
 bridge.registerTrigger({
-  triggerType: 'api',
-  functionPath: 'users.create',
+  trigger_type: 'api',
+  function_path: 'users.create',
   config: {
     api_path: '/users',
     http_method: 'POST'

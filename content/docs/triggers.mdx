@@ -26,12 +26,12 @@ A trigger consists of three parts:
 
 ```typescript
 bridge.registerTrigger({
-  triggerType: 'api',           // 1. Trigger Type
-  config: {                     // 2. Configuration
+  trigger_type: 'api',           // 1. Trigger Type
+  config: {                      // 2. Configuration
     api_path: '/users',
     http_method: 'POST'
   },
-  functionPath: 'users.create'  // 3. Function Path
+  function_path: 'users.create'  // 3. Function Path
 });
 ```
 
@@ -61,7 +61,7 @@ First, register the function that will be invoked:
 
 ```typescript
 bridge.registerFunction({
-  functionPath: 'users.create',
+  function_path: 'users.create',
   handler: async (data) => {
     // Function logic
     return { id: '123', ...data };
@@ -75,8 +75,8 @@ Then, register a trigger that routes to that function:
 
 ```typescript
 bridge.registerTrigger({
-  triggerType: 'api',
-  functionPath: 'users.create',  // Must match registered function
+  trigger_type: 'api',
+  function_path: 'users.create',  // Must match registered function
   config: {
     api_path: '/users',
     http_method: 'POST'
@@ -94,8 +94,8 @@ The engine sets up the trigger in the appropriate module. Now when an HTTP POST 
 
 ```typescript
 {
-  triggerType: 'api',
-  functionPath: 'api.endpoint',
+  trigger_type: 'api',
+  function_path: 'api.endpoint',
   config: {
     api_path: '/api/v1/resource/:id',  // Supports path parameters
     http_method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
@@ -114,8 +114,8 @@ The engine sets up the trigger in the appropriate module. Now when an HTTP POST 
 
 ```typescript
 {
-  triggerType: 'event',
-  functionPath: 'events.handler',
+  trigger_type: 'event',
+  function_path: 'events.handler',
   config: {
     subscribes: [
       'user.created',
@@ -132,8 +132,8 @@ The engine sets up the trigger in the appropriate module. Now when an HTTP POST 
 
 ```typescript
 {
-  triggerType: 'cron',
-  functionPath: 'jobs.scheduled',
+  trigger_type: 'cron',
+  function_path: 'jobs.scheduled',
   config: {
     cron: '*/5 * * * *'  // Every 5 minutes
   }
@@ -146,8 +146,8 @@ The engine sets up the trigger in the appropriate module. Now when an HTTP POST 
 
 ```typescript
 {
-  triggerType: 'log',
-  functionPath: 'monitoring.onError',
+  trigger_type: 'log',
+  function_path: 'monitoring.onError',
   config: {
     level: 'error'  // Optional: filter by log level
   }
@@ -160,8 +160,8 @@ The engine sets up the trigger in the appropriate module. Now when an HTTP POST 
 
 ```typescript
 {
-  triggerType: 'streams:join',
-  functionPath: 'streams.onJoin',
+  trigger_type: 'streams:join',
+  function_path: 'streams.onJoin',
   config: {}  // No configuration needed
 }
 ```
@@ -173,7 +173,7 @@ A single function can have multiple triggers:
 ```typescript
 // Register function once
 bridge.registerFunction({
-  functionPath: 'users.notify',
+  function_path: 'users.notify',
   handler: async (data) => {
     await sendNotification(data);
   }
@@ -181,22 +181,22 @@ bridge.registerFunction({
 
 // Trigger from API
 bridge.registerTrigger({
-  triggerType: 'api',
-  functionPath: 'users.notify',
+  trigger_type: 'api',
+  function_path: 'users.notify',
   config: { api_path: '/notify', http_method: 'POST' }
 });
 
 // Trigger from events
 bridge.registerTrigger({
-  triggerType: 'event',
-  functionPath: 'users.notify',
+  trigger_type: 'event',
+  function_path: 'users.notify',
   config: { subscribes: ['user.created', 'order.placed'] }
 });
 
 // Trigger from cron
 bridge.registerTrigger({
-  triggerType: 'cron',
-  functionPath: 'users.notify',
+  trigger_type: 'cron',
+  function_path: 'users.notify',
   config: { cron: '0 9 * * *' }
 });
 ```
@@ -224,8 +224,8 @@ const triggerId = 'unique-trigger-id';
 
 bridge.registerTrigger({
   id: triggerId,
-  triggerType: 'api',
-  functionPath: 'api.temp',
+  trigger_type: 'api',
+  function_path: 'api.temp',
   config: { api_path: '/temp', http_method: 'GET' }
 });
 
@@ -239,7 +239,7 @@ bridge.unregisterTrigger(triggerId);
 
 ```typescript
 bridge.registerFunction({
-  functionPath: 'webhooks.github',
+  function_path: 'webhooks.github',
   handler: async (req) => {
     const event = req.headers['x-github-event'];
     const payload = req.body;
@@ -251,8 +251,8 @@ bridge.registerFunction({
 });
 
 bridge.registerTrigger({
-  triggerType: 'api',
-  functionPath: 'webhooks.github',
+  trigger_type: 'api',
+  function_path: 'webhooks.github',
   config: {
     api_path: '/webhooks/github',
     http_method: 'POST'
@@ -265,12 +265,12 @@ bridge.registerTrigger({
 ```typescript
 // Step 1: Order placed
 bridge.registerFunction({
-  functionPath: 'orders.process',
+  function_path: 'orders.process',
   handler: async (order) => {
     await saveOrder(order);
     // Emit next event in chain
     await bridge.invokeFunction({
-      functionPath: 'event.emit',
+      function_path: 'event.emit',
       data: {
         topic: 'order.processed',
         data: order
@@ -280,22 +280,22 @@ bridge.registerFunction({
 });
 
 bridge.registerTrigger({
-  triggerType: 'event',
-  functionPath: 'orders.process',
+  trigger_type: 'event',
+  function_path: 'orders.process',
   config: { subscribes: ['order.placed'] }
 });
 
 // Step 2: Send confirmation
 bridge.registerFunction({
-  functionPath: 'orders.sendConfirmation',
+  function_path: 'orders.sendConfirmation',
   handler: async (order) => {
     await sendEmail(order.email, 'Order confirmed');
   }
 });
 
 bridge.registerTrigger({
-  triggerType: 'event',
-  functionPath: 'orders.sendConfirmation',
+  trigger_type: 'event',
+  function_path: 'orders.sendConfirmation',
   config: { subscribes: ['order.processed'] }
 });
 ```
@@ -304,16 +304,16 @@ bridge.registerTrigger({
 
 ```typescript
 bridge.registerFunction({
-  functionPath: 'maintenance.cleanup',
+  function_path: 'maintenance.cleanup',
   handler: async () => {
     const deleted = await deleteOldRecords();
-    console.log(`Deleted ${deleted} old records`);
+    logger.info(`Deleted ${deleted} old records`);
   }
 });
 
 bridge.registerTrigger({
-  triggerType: 'cron',
-  functionPath: 'maintenance.cleanup',
+  trigger_type: 'cron',
+  function_path: 'maintenance.cleanup',
   config: {
     cron: '0 3 * * *'  // Every day at 3 AM
   }
@@ -329,8 +329,8 @@ bridge.registerTrigger({
     ```typescript
     bridge.registerTrigger({
       id: 'api-users-create-v1',  // Versioned, descriptive
-      triggerType: 'api',
-      functionPath: 'users.create',
+      trigger_type: 'api',
+      function_path: 'users.create',
       config: { api_path: '/users', http_method: 'POST' }
     });
     ```
@@ -342,14 +342,14 @@ bridge.registerTrigger({
     ```typescript
     // Function expects { name, email }
     bridge.registerFunction({
-      functionPath: 'users.create',
+      function_path: 'users.create',
       handler: async ({ name, email }) => { /* ... */ }
     });
 
     // API trigger should accept POST with body
     bridge.registerTrigger({
-      triggerType: 'api',
-      functionPath: 'users.create',
+      trigger_type: 'api',
+      function_path: 'users.create',
       config: { http_method: 'POST' }  // Not GET
     });
     ```
@@ -374,7 +374,7 @@ bridge.registerTrigger({
 
     ```typescript
     bridge.registerFunction({
-      functionPath: 'api.create',
+      function_path: 'api.create',
       handler: async (req) => {
         try {
           const result = await createResource(req.body);

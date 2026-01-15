@@ -8,11 +8,11 @@ Trigger Types define different ways to invoke functions in the iii Engine.
 
 A Trigger Type is a mechanism that can initiate function execution. The iii Engine supports multiple trigger types, each serving different use cases:
 
-- **API**: HTTP requests
-- **Event**: Published events on topics
-- **Cron**: Scheduled time-based execution
-- **Log**: System log events
-- **Streams**: Stream connection lifecycle (join/leave)
+- **[API](/docs/core-modules-list/module-rest-api)**: HTTP requests
+- **[Event](/docs/core-modules-list/module-event)**: Published events on topics
+- **[Cron](/docs/core-modules-list/module-cron)**: Scheduled time-based execution
+- **[Log](/docs/core-modules-list/module-logging)**: System log events
+- **[Streams](/docs/core-modules-list/module-stream)**: Stream connection lifecycle (join/leave)
 
 ```mermaid
 graph LR
@@ -31,7 +31,7 @@ graph LR
 
 Executes functions in response to HTTP requests.
 
-**Provided by**: REST API Module
+**Provided by**: [REST API Module](/docs/core-modules-list/module-rest-api)
 
 **Configuration:**
 
@@ -59,7 +59,7 @@ Executes functions in response to HTTP requests.
 
 Executes functions when events are published to subscribed topics.
 
-**Provided by**: Event Module
+**Provided by**: [Event Module](/docs/core-modules-list/module-event)
 
 **Configuration:**
 
@@ -86,7 +86,7 @@ Executes functions when events are published to subscribed topics.
 
 Executes functions on a time-based schedule using cron expressions.
 
-**Provided by**: Cron Module
+**Provided by**: [Cron Module](/docs/core-modules-list/module-cron)
 
 **Configuration:**
 
@@ -113,7 +113,7 @@ Executes functions on a time-based schedule using cron expressions.
 
 Executes functions when log entries match specified criteria.
 
-**Provided by**: Logging Module
+**Provided by**: [Logging Module](/docs/core-modules-list/module-logging)
 
 **Configuration:**
 
@@ -140,7 +140,7 @@ Executes functions when log entries match specified criteria.
 
 Executes functions when clients connect to or disconnect from streams.
 
-**Provided by**: Stream Module
+**Provided by**: [Stream Module](/docs/core-modules-list/module-stream)
 
 **Configuration:**
 
@@ -199,8 +199,8 @@ Workers can then register triggers using these types:
 
 ```typescript
 bridge.registerTrigger({
-  triggerType: 'api',  // Must be a registered trigger type
-  functionPath: 'users.create',
+  trigger_type: 'api',  // Must be a registered trigger type
+  function_path: 'users.create',
   config: { /* trigger-specific config */ }
 });
 ```
@@ -232,7 +232,7 @@ impl CoreModule for CustomModule {
 ```typescript
 // Register function
 bridge.registerFunction({
-  functionPath: 'api.getUser',
+  function_path: 'api.getUser',
   handler: async (req) => ({
     status: 200,
     body: { user: { id: req.path_params.id } }
@@ -241,8 +241,8 @@ bridge.registerFunction({
 
 // Register API trigger
 bridge.registerTrigger({
-  triggerType: 'api',
-  functionPath: 'api.getUser',
+  trigger_type: 'api',
+  function_path: 'api.getUser',
   config: {
     api_path: '/users/:id',
     http_method: 'GET'
@@ -255,7 +255,7 @@ bridge.registerTrigger({
 ```typescript
 // Emit events
 await bridge.invokeFunction({
-  functionPath: 'event.emit',
+  function_path: 'event.emit',
   data: {
     topic: 'order.placed',
     data: { orderId: '123', amount: 99.99 }
@@ -264,15 +264,15 @@ await bridge.invokeFunction({
 
 // Subscribe to events
 bridge.registerFunction({
-  functionPath: 'notifications.sendOrderEmail',
+  function_path: 'notifications.sendOrderEmail',
   handler: async (data) => {
     await sendEmail(data);
   }
 });
 
 bridge.registerTrigger({
-  triggerType: 'event',
-  functionPath: 'notifications.sendOrderEmail',
+  trigger_type: 'event',
+  function_path: 'notifications.sendOrderEmail',
   config: {
     subscribes: ['order.placed']
   }
@@ -283,7 +283,7 @@ bridge.registerTrigger({
 
 ```typescript
 bridge.registerFunction({
-  functionPath: 'jobs.dailyReport',
+  function_path: 'jobs.dailyReport',
   handler: async () => {
     const report = await generateReport();
     await sendReport(report);
@@ -291,8 +291,8 @@ bridge.registerFunction({
 });
 
 bridge.registerTrigger({
-  triggerType: 'cron',
-  functionPath: 'jobs.dailyReport',
+  trigger_type: 'cron',
+  function_path: 'jobs.dailyReport',
   config: {
     cron: '0 9 * * *'  // Every day at 9 AM
   }

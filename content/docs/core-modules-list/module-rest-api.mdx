@@ -68,7 +68,7 @@ This Module add a new Trigger Type: `api`.
 
 ```typescript
 bridge.registerTrigger({
-  triggerType: 'api',
+  trigger_type: 'api',
   functionPath,
   config: {
     api_path: '/api/v1/users',
@@ -151,13 +151,13 @@ async function getUser(req: ApiRequest) {
 }
 
 bridge.registerFunction({
-  functionPath: 'api.getUser',
+  function_path: 'api.getUser',
   handler: getUser,
 });
 
 bridge.registerTrigger({
-  triggerType: 'api',
-  functionPath: 'api.getUser',
+  trigger_type: 'api',
+  function_path: 'api.getUser',
   config: {
     api_path: '/users/:id',
     http_method: 'GET',

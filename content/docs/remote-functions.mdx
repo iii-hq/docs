@@ -31,8 +31,8 @@ Functions are registered by workers during initialization:
 
 ```typescript
 bridge.registerFunction({
-  functionPath: 'service.action',
-  handler: async (data, context) => {
+  function_path: 'service.action',
+  handler: async (data) => {
     // Function logic here
     return result;
   },
@@ -43,7 +43,7 @@ bridge.registerFunction({
 
 ### Function Path
 
-The `functionPath` is a unique identifier using dot notation:
+The `function_path` is a unique identifier using dot notation:
 
 **Pattern**: `service.action`
 
@@ -62,10 +62,10 @@ The `functionPath` is a unique identifier using dot notation:
 
 ## Function Handler
 
-The handler is an async function that receives input data and context:
+The handler is an async function that receives input data:
 
 ```typescript
-async function handler(data: any, context?: Context) {
+async function handler(data: any) {
   // Access input data
   const { name, email } = data;
 
@@ -107,7 +107,7 @@ Most common pattern - triggers automatically invoke functions:
 ```typescript
 // 1. Register function
 bridge.registerFunction({
-  functionPath: 'users.create',
+  function_path: 'users.create',
   handler: async (req) => {
     const user = await db.createUser(req.body);
     return { status: 201, body: user };
@@ -116,8 +116,8 @@ bridge.registerFunction({
 
 // 2. Register trigger
 bridge.registerTrigger({
-  triggerType: 'api',
-  functionPath: 'users.create',
+  trigger_type: 'api',
+  function_path: 'users.create',
   config: { api_path: '/users', http_method: 'POST' }
 });
 
@@ -130,20 +130,20 @@ Call functions directly from other functions:
 
 ```typescript
 bridge.registerFunction({
-  functionPath: 'users.sendWelcome',
+  function_path: 'users.sendWelcome',
   handler: async (user) => {
     await sendEmail(user.email, 'Welcome!');
   }
 });
 
 bridge.registerFunction({
-  functionPath: 'users.create',
+  function_path: 'users.create',
   handler: async (data) => {
     const user = await db.createUser(data);
 
     // Invoke another function
     await bridge.invokeFunction({
-      functionPath: 'users.sendWelcome',
+      function_path: 'users.sendWelcome',
       data: user
     });
 
@@ -172,11 +172,11 @@ sequenceDiagram
 ```typescript
 // Worker 1 - API handler
 bridge.registerFunction({
-  functionPath: 'api.processOrder',
+  function_path: 'api.processOrder',
   handler: async (req) => {
     // Call function in Worker 2
     const result = await bridge.invokeFunction({
-      functionPath: 'payments.charge',  // In Worker 2
+      function_path: 'payments.charge',  // In Worker 2
       data: { amount: req.body.amount }
     });
 
@@ -186,7 +186,7 @@ bridge.registerFunction({
 
 // Worker 2 - Payment processor
 bridge.registerFunction({
-  functionPath: 'payments.charge',
+  function_path: 'payments.charge',
   handler: async ({ amount }) => {
     const charge = await stripe.charge(amount);
     return { chargeId: charge.id };
@@ -200,7 +200,7 @@ Define input/output schemas for documentation and validation:
 
 ```typescript
 bridge.registerFunction({
-  functionPath: 'users.create',
+  function_path: 'users.create',
   handler: async (data) => { /* ... */ },
   description: 'Create a new user account',
   request_format: {
@@ -223,36 +223,13 @@ bridge.registerFunction({
 });
 ```
 
-## Function Context
-
-Functions receive an optional context object with runtime information:
-
-```typescript
-bridge.registerFunction({
-  functionPath: 'example.handler',
-  handler: async (data, context) => {
-    // Access context
-    console.log('Trace ID:', context.trace_id);
-    console.log('Invocation ID:', context.invocation_id);
-    console.log('Trigger:', context.trigger);
-
-    return result;
-  }
-});
-```
-
-**Context Fields**:
-- `trace_id`: Distributed tracing identifier
-- `invocation_id`: Unique ID for this invocation
-- `trigger`: Information about what triggered the function
-
 ## Error Handling
 
 Functions should handle errors gracefully:
 
 ```typescript
 bridge.registerFunction({
-  functionPath: 'users.create',
+  function_path: 'users.create',
   handler: async (req) => {
     try {
       // Validate input
@@ -272,7 +249,7 @@ bridge.registerFunction({
       };
     } catch (error) {
       // Log error
-      console.error('Failed to create user:', error);
+      logger.error('Failed to create user:', error);
 
       // Return error response
       return {
@@ -294,7 +271,7 @@ bridge.registerFunction({
 ```typescript
 // Create
 bridge.registerFunction({
-  functionPath: 'users.create',
+  function_path: 'users.create',
   handler: async (req) => {
     const user = await db.insert(req.body);
     return { status: 201, body: user };
@@ -303,7 +280,7 @@ bridge.registerFunction({
 
 // Read
 bridge.registerFunction({
-  functionPath: 'users.get',
+  function_path: 'users.get',
   handler: async (req) => {
     const user = await db.findById(req.path_params.id);
     if (!user) return { status: 404, body: { error: 'Not found' } };
@@ -313,7 +290,7 @@ bridge.registerFunction({
 
 // Update
 bridge.registerFunction({
-  functionPath: 'users.update',
+  function_path: 'users.update',
   handler: async (req) => {
     const user = await db.update(req.path_params.id, req.body);
     return { status: 200, body: user };
@@ -322,7 +299,7 @@ bridge.registerFunction({
 
 // Delete
 bridge.registerFunction({
-  functionPath: 'users.delete',
+  function_path: 'users.delete',
   handler: async (req) => {
     await db.delete(req.path_params.id);
     return { status: 204, body: null };
@@ -334,14 +311,14 @@ bridge.registerFunction({
 
 ```typescript
 bridge.registerFunction({
-  functionPath: 'orders.create',
+  function_path: 'orders.create',
   handler: async (req) => {
     // Create order
     const order = await db.createOrder(req.body);
 
     // Emit event
     await bridge.invokeFunction({
-      functionPath: 'event.emit',
+      function_path: 'event.emit',
       data: {
         topic: 'order.created',
         data: order
@@ -358,7 +335,7 @@ bridge.registerFunction({
 ```typescript
 // Utility function
 bridge.registerFunction({
-  functionPath: 'utils.validateEmail',
+  function_path: 'utils.validateEmail',
   handler: async ({ email }) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
@@ -366,11 +343,11 @@ bridge.registerFunction({
 
 // Main function using utility
 bridge.registerFunction({
-  functionPath: 'users.create',
+  function_path: 'users.create',
   handler: async (req) => {
     // Call utility function
     const isValid = await bridge.invokeFunction({
-      functionPath: 'utils.validateEmail',
+      function_path: 'utils.validateEmail',
       data: { email: req.body.email }
     });
 
@@ -389,11 +366,11 @@ bridge.registerFunction({
 
 ```typescript
 bridge.registerFunction({
-  functionPath: 'api.processLarge',
+  function_path: 'api.processLarge',
   handler: async (req) => {
     // Queue background job (fire and forget)
     bridge.invokeFunction({
-      functionPath: 'jobs.processData',
+      function_path: 'jobs.processData',
       data: req.body
     }).catch(err => console.error('Job failed:', err));
 
@@ -406,14 +383,14 @@ bridge.registerFunction({
 });
 
 bridge.registerFunction({
-  functionPath: 'jobs.processData',
+  function_path: 'jobs.processData',
   handler: async (data) => {
     // Long-running process
     await processLargeDataset(data);
 
     // Emit completion event
     await bridge.invokeFunction({
-      functionPath: 'event.emit',
+      function_path: 'event.emit',
       data: {
         topic: 'processing.completed',
         data: { jobId: data.id }
@@ -431,12 +408,12 @@ bridge.registerFunction({
 
     ```typescript
     // Good: Focused functions
-    bridge.registerFunction({ functionPath: 'users.create', ... });
-    bridge.registerFunction({ functionPath: 'users.sendWelcome', ... });
+    bridge.registerFunction({ function_path: 'users.create', ... });
+    bridge.registerFunction({ function_path: 'users.sendWelcome', ... });
 
     // Avoid: Doing too much in one function
     bridge.registerFunction({
-      functionPath: 'users.createAndEmailAndLog',
+      function_path: 'users.createAndEmailAndLog',
       handler: async (data) => {
         const user = await createUser(data);
         await sendEmail(user);
@@ -485,20 +462,22 @@ bridge.registerFunction({
   </Accordion>
 
   <Accordion title="Log Important Events">
-    Use logging for debugging and monitoring:
+    Use the logger for debugging and monitoring:
 
     ```typescript
+    import { logger } from '@iii-dev/sdk';
+
     bridge.registerFunction({
-      functionPath: 'payments.charge',
-      handler: async (data, context) => {
-        console.log(`[${context.trace_id}] Processing payment`, data);
+      function_path: 'payments.charge',
+      handler: async (data) => {
+        logger.info('Processing payment', data);
 
         try {
           const result = await processPayment(data);
-          console.log(`[${context.trace_id}] Payment successful`, result);
+          logger.info('Payment successful', result);
           return result;
         } catch (error) {
-          console.error(`[${context.trace_id}] Payment failed`, error);
+          logger.error('Payment failed', error);
           throw error;
         }
       }

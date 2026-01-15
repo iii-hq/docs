@@ -92,7 +92,7 @@ This Module adds a new Trigger Type: `log`.
 ```typescript
 // Register a function to handle log events
 bridge.registerFunction({
-  functionPath: 'monitoring.onError',
+  function_path: 'monitoring.onError',
   handler: async (logEntry) => {
     console.log('Error logged:', logEntry);
     // Send alert, store in database, etc.
@@ -101,8 +101,8 @@ bridge.registerFunction({
 
 // Subscribe to error logs
 bridge.registerTrigger({
-  triggerType: 'log',
-  functionPath: 'monitoring.onError',
+  trigger_type: 'log',
+  function_path: 'monitoring.onError',
   config: {
     level: 'error',
   },

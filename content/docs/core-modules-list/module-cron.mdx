@@ -66,19 +66,21 @@ This Module adds a new Trigger Type: `cron`.
 ### Sample Code
 
 ```typescript
+import { logger } from '@iii-dev/sdk';
+
 // Register a function to run on a schedule
 bridge.registerFunction({
-  functionPath: 'jobs.cleanupOldData',
+  function_path: 'jobs.cleanupOldData',
   handler: async () => {
-    console.log('Running scheduled cleanup...');
+    logger.info('Running scheduled cleanup...');
     // Perform cleanup tasks
   },
 });
 
 // Schedule to run every day at 2 AM
 bridge.registerTrigger({
-  triggerType: 'cron',
-  functionPath: 'jobs.cleanupOldData',
+  trigger_type: 'cron',
+  function_path: 'jobs.cleanupOldData',
   config: {
     cron: '0 2 * * *',
   },

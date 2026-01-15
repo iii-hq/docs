@@ -61,7 +61,7 @@ bridge.registerService({
 
 // Register a function
 bridge.registerFunction({
-  functionPath: 'users.create',
+  function_path: 'users.create',
   handler: async (data) => {
     // Business logic here
     return { id: '123', ...data };
@@ -70,8 +70,8 @@ bridge.registerFunction({
 
 // Register a trigger
 bridge.registerTrigger({
-  triggerType: 'api',
-  functionPath: 'users.create',
+  trigger_type: 'api',
+  function_path: 'users.create',
   config: {
     api_path: '/users',
     http_method: 'POST',
@@ -155,7 +155,7 @@ const bridge = createBridge();
 
 // Register functions
 bridge.registerFunction({
-  functionPath: 'greet.hello',
+  function_path: 'greet.hello',
   handler: async ({ name }) => {
     return { message: `Hello, ${name}!` };
   },
@@ -163,8 +163,8 @@ bridge.registerFunction({
 
 // Register API trigger
 bridge.registerTrigger({
-  triggerType: 'api',
-  functionPath: 'greet.hello',
+  trigger_type: 'api',
+  function_path: 'greet.hello',
   config: {
     api_path: '/greet/:name',
     http_method: 'GET',
@@ -173,7 +173,7 @@ bridge.registerTrigger({
 
 // Connect to engine
 await bridge.connect();
-console.log('Worker connected!');
+logger.info('Worker connected!');
 ```
 
 ### Python (iii SDK)
@@ -221,7 +221,7 @@ bridge.connect()
 
     ```typescript
     bridge.registerFunction({
-      functionPath: 'users.create',
+      function_path: 'users.create',
       handler: async (data) => {
         try {
           const user = await createUser(data);
@@ -260,14 +260,14 @@ bridge.connect()
     ```typescript
     // User service
     bridge.registerService({ id: 'users' });
-    bridge.registerFunction({ functionPath: 'users.create', ... });
-    bridge.registerFunction({ functionPath: 'users.update', ... });
-    bridge.registerFunction({ functionPath: 'users.delete', ... });
+    bridge.registerFunction({ function_path: 'users.create', ... });
+    bridge.registerFunction({ function_path: 'users.update', ... });
+    bridge.registerFunction({ function_path: 'users.delete', ... });
 
     // Auth service
     bridge.registerService({ id: 'auth' });
-    bridge.registerFunction({ functionPath: 'auth.login', ... });
-    bridge.registerFunction({ functionPath: 'auth.logout', ... });
+    bridge.registerFunction({ function_path: 'auth.login', ... });
+    bridge.registerFunction({ function_path: 'auth.logout', ... });
     ```
   </Accordion>
 </AccordionGroup>
