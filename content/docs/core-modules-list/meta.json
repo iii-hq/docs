@@ -8,6 +8,7 @@
     "module-logging",
     "module-stream",
     "module-kv-server",
-    "module-exec"
+    "module-exec",
+    "module-bridge"
   ]
 }
