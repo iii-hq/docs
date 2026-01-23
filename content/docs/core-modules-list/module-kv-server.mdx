@@ -164,6 +164,10 @@ console.log(userKeys); // ['user:1', 'user:2']
 
 The KV Server supports atomic update operations for modifying values in place.
 
+<Tip>
+Update operations are available through the `KVStoreAdapter` interface and are used internally by other modules (e.g., streams). These operations are not currently exposed as a public `kv_server.update` function but can be accessed through the adapter when building custom modules or extensions.
+</Tip>
+
 <Expandable title="UpdateOp Types">
   <ResponseField name="Set" type="object">
     Set a value at a specific path (overwrite).
@@ -200,3 +204,112 @@ The KV Server supports atomic update operations for modifying values in place.
     ```
   </ResponseField>
 </Expandable>
+
+### Update Operations Examples
+
+Below are practical examples showing how update operations work. These operations are atomic, meaning multiple updates can be applied together without race conditions.
+
+#### Set Operation
+
+Update a specific nested field:
+
+```typescript
+// Update user's last login timestamp
+await adapter.update('user:123', [
+  { Set: { path: 'profile.lastLogin', value: new Date().toISOString() } }
+]);
+
+// Before: { name: 'John', profile: { email: 'john@example.com' } }
+// After:  { name: 'John', profile: { email: 'john@example.com', lastLogin: '2026-01-23T10:30:00Z' } }
+```
+
+#### Merge Operation
+
+Add fields without overwriting existing ones:
+
+```typescript
+// Add premium status to user
+await adapter.update('user:123', [
+  { Merge: { path: null, value: { isPremium: true, premiumSince: '2026-01-23' } } }
+]);
+
+// Before: { name: 'John', email: 'john@example.com' }
+// After:  { name: 'John', email: 'john@example.com', isPremium: true, premiumSince: '2026-01-23' }
+```
+
+#### Increment Operation
+
+Increment counters:
+
+```typescript
+// Increment post view count
+await adapter.update('post:456', [
+  { Increment: { path: 'views', by: 1 } }
+]);
+
+// Increment login count
+await adapter.update('user:123', [
+  { Increment: { path: 'stats.loginCount', by: 1 } }
+]);
+
+// Before: { stats: { loginCount: 5 } }
+// After:  { stats: { loginCount: 6 } }
+```
+
+#### Decrement Operation
+
+Decrement values (e.g., inventory management):
+
+```typescript
+// Reduce product stock
+await adapter.update('product:789', [
+  { Decrement: { path: 'inventory.stock', by: 1 } }
+]);
+
+// Before: { inventory: { stock: 10 } }
+// After:  { inventory: { stock: 9 } }
+```
+
+#### Remove Operation
+
+Delete a field from the value:
+
+```typescript
+// Remove temporary access token
+await adapter.update('user:123', [
+  { Remove: { path: 'tempToken' } }
+]);
+
+// Before: { name: 'John', tempToken: 'abc123' }
+// After:  { name: 'John' }
+```
+
+#### Composite Operations
+
+Multiple atomic operations in a single update:
+
+```typescript
+// Update multiple fields atomically
+await adapter.update('user:123', [
+  { Increment: { path: 'loginCount', by: 1 } },
+  { Set: { path: 'lastLogin', value: new Date().toISOString() } },
+  { Set: { path: 'lastIp', value: '192.168.1.1' } }
+]);
+
+// All operations succeed or fail together (atomic)
+// Before: { name: 'John', loginCount: 10, lastLogin: '2026-01-20T08:00:00Z' }
+// After:  { name: 'John', loginCount: 11, lastLogin: '2026-01-23T10:30:00Z', lastIp: '192.168.1.1' }
+```
+
+#### Real-World Use Case: Stream Module
+
+The stream module uses update operations internally for managing stream state:
+
+```typescript
+// When a new message is added to a stream
+await adapter.update(`stream:${streamId}`, [
+  { Increment: { path: 'messageCount', by: 1 } },
+  { Set: { path: 'lastMessageAt', value: new Date().toISOString() } },
+  { Set: { path: 'lastMessageId', value: messageId } }
+]);
+```
