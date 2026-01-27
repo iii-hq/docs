@@ -1,8 +1,8 @@
-import { SidebarItem } from '@/lib/components/SidebarItem'
-import { baseOptions } from '@/lib/layout.shared'
-import { source } from '@/lib/source'
-import { DocsLayout } from 'fumadocs-ui/layouts/docs'
-import { SidebarFolder } from '@/lib/components/SidebarFolder'
+import { DocsLayout } from "fumadocs-ui/layouts/docs";
+import { SidebarFolder } from "@/lib/components/SidebarFolder";
+import { SidebarItem } from "@/lib/components/SidebarItem";
+import { baseOptions } from "@/lib/layout.shared";
+import { source } from "@/lib/source";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -21,5 +21,5 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     >
       {children}
     </DocsLayout>
-  )
+  );
 }

@@ -1,5 +1,5 @@
-import { AlertTriangle as WarningIcon } from 'lucide-react'
-import { PropsWithChildren } from 'react'
+import { AlertTriangle as WarningIcon } from "lucide-react";
+import type { PropsWithChildren } from "react";
 
 export const Warning: React.FC<PropsWithChildren> = ({ children }) => {
   return (
@@ -7,5 +7,5 @@ export const Warning: React.FC<PropsWithChildren> = ({ children }) => {
       <WarningIcon className="size-6 text-yellow-500 mt-1" />
       {children}
     </div>
-  )
-}
+  );
+};

@@ -1,6 +1,4 @@
 {
   "title": "API Reference",
-  "pages": [
-    "iii-sdk"
-  ]
+  "pages": ["iii-sdk"]
 }

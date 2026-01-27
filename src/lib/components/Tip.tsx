@@ -1,5 +1,5 @@
-import { Info } from 'lucide-react'
-import { PropsWithChildren } from 'react'
+import { Info } from "lucide-react";
+import type { PropsWithChildren } from "react";
 
 export const Tip: React.FC<PropsWithChildren> = ({ children }) => {
   return (
@@ -7,5 +7,5 @@ export const Tip: React.FC<PropsWithChildren> = ({ children }) => {
       <Info className="size-6 text-green-500 mt-1" />
       {children}
     </div>
-  )
-}
+  );
+};
