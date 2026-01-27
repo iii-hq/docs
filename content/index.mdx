@@ -1,3 +1,82 @@
 ---
-title: 'Welcome'
+title: Welcome to iii
+description: The universal backend engine for modular orchestration that you don't need to think about.
 ---
+
+import { Zap, Box, Repeat, Terminal, LayoutTemplate } from 'lucide-react'
+
+# Welcome to iii
+
+**iii** (pronounced "Three Eye") is the Universal Backend Engine. It unifies your entire infrastructure—APIs, background jobs, workflows, queues, state, and everything else—into a single, durable runtime.
+
+**iii** gives you a "Modular Monolith" that scales like microservices but is as easy to build as a single application.
+
+**iii** centralizes the architecture of your backend and removes complexity by transforming every backend operation into two core primitives: Triggers and Functions. These primitives are the mechanism by which complexity is removed.
+
+<Callout title="The Paradigm Shift" type="info">
+  If React revolutionized the frontend with the Component then iii intends to do the same on the backend with Triggers
+  and Functions.
+</Callout>
+
+## Why use iii?
+
+Modern backend development imposes a heavy "Infrastructure Tax." **iii** removes the glue code and gives you a unified engine that handles the plumbing for you.
+
+<Cards>
+  <Card icon={<LayoutTemplate />} title="The React of the Backend" href="/concepts/paradigm">
+    Forget managing event listeners and queues. Define your logic as **Triggers** and **Functions**, and let the engine
+    handle the orchestration.
+  </Card>
+  <Card icon={<Repeat />} title="Durable Execution" href="/features/reliability">
+    Sleep easy. All processes are durable by default. If your server crashes or restarts, iii resumes your workflows
+    exactly where they left off—no data lost.
+  </Card>
+  <Card icon={<Box />} title="Infrastructure Agnostic" href="/concepts/deployment">
+    Run anywhere. Whether it's a Raspberry Pi in your basement, a Docker container on a VPS, or a serverless
+    function—the engine runs your code consistently.
+  </Card>
+  <Card icon={<Zap />} title="Unified Observability" href="/features/telemetry">
+    Zero-config telemetry. See the full lifecycle of a request—from API trigger to background job to database update—in
+    a single view.
+  </Card>
+</Cards>
+
+## Getting Started
+
+You are minutes away from your first durable workflow.
+
+### 1. Install the CLI
+
+Get the toolchain installed on your machine.
+
+```bash
+curl -fsSL iii.sh/install.sh | sh
+```
+
+### 2. Initialize a Project
+
+Create a new project scaffolding with TypeScript support out of the box.
+
+```bash
+iii init my-new-backend
+cd my-new-backend
+```
+
+### 3. Run the Engine
+
+Start the local development engine. This spins up the runtime, dashboard, and worker processes.
+
+```bash
+iii dev
+```
+
+## Next Steps
+
+<Cards>
+  <Card icon={<Terminal />} title="Quickstart Guide" href="/docs/quickstart">
+    Build your first API trigger and background job in under 5 minutes.
+  </Card>
+  <Card icon={<LayoutTemplate />} title="Architecture Overview" href="/concepts/architecture">
+    Understand how Triggers, Functions, and Workers fit together.
+  </Card>
+</Cards>
