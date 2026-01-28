@@ -2,16 +2,15 @@
 title: 'Triggers'
 ---
 
-Triggers connect Trigger Types to Functions, creating the link between events and execution.
-
-## What are Triggers?
-
-A **Trigger** is a configured instance of a **Trigger Type** that routes invocations to a specific **Function**.
+Triggers define conditions and subscribe to events. When the Trigger's conditions are met it calls Function(s) and with the payload of the event that triggered it. This architecture is what enables your application code to be decoupled from the architecture it runs on.
 
 ```mermaid
 graph LR
-    TriggerType[Trigger Type<br/>e.g., 'api'] -->|+Configuration| Trigger[Trigger<br/>POST /users]
-    Trigger -->|Routes to| Function[Function<br/>users.create]
+    subgraph Trigger[Trigger]
+        Config[Config<br/>subscribe: POST /users]
+    end
+    subgraph Function[Function]
+        Fn[create_user]
+    end
+    Trigger -->|Calls| Function
 ```
-
-**Key Concept**: Triggers decouple _what initiates an action_ (Trigger Type) from _what logic runs_ (Function).
