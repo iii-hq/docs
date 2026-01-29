@@ -10,13 +10,17 @@ The payload is the data that was passed from the Trigger to the function.
 
 The context object is how you access the full application functionality such as state, logging, databasing, emitting events. If the iii engine has access to it then the context object will contain it.
 
+This process illustrated below is simplified but the end result is the same.
+
 ```mermaid
 graph TB
     subgraph Trigger[Trigger]
         Config[POST /users]
     end
 
-    Trigger -->|payload| Fn
+    Event((Event<br/>POST /users)) -->|fires| Trigger
+
+    Trigger -->|"payload<br/>(optional)"| Fn
 
     subgraph Function[Function]
         Fn[create_user]
@@ -28,11 +32,5 @@ graph TB
         P1 --> P3[Return Response]
     end
 
-    Function -->|response| Trigger
-
-    style Config fill:#f3f724,color:#000000
-    style Fn fill:#f3f724,color:#000000
-    style P1 fill:#1d1d1d,color:#f4f4f4,stroke:#f3f724
-    style P2 fill:#1d1d1d,color:#f4f4f4,stroke:#f3f724
-    style P3 fill:#1d1d1d,color:#f4f4f4,stroke:#f3f724
+    Function -->|"response<br/>(optional)"| Trigger
 ```
