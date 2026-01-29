@@ -2,18 +2,29 @@
 title: 'Engine'
 ---
 
-Whenever a Trigger fires it tells the Engine a target Function to call and the payload to send it. The Engine itself handles the routing and sends that message on to a Worker that contains that Function and can handle the request.
+Whenever a Trigger fires it tells the Engine a target Function to call and the payload to send it. The Engine itself handles the routing and sends that message along with a context on to a Worker that contains that Function and can handle the request.
 
 The iii engine is the central orchestrator of a iii powered application. It knows where every part of your application lives and routes requests to those parts. This architecture is what enables your application code to be decoupled from the architecture it runs on. iii is architecture agnostic and it makes no difference if an application is split across cloud providers, colocated servers with long running processes, remote functions, databases, message queues, and inside ancient stacks.
 
 ```mermaid
-graph LR
-    Event((Event<br/>POST /users)) -->|fires| Trigger
+graph TB
+    Event((Event<br/>POST /users)) -->|POST /users| Trigger
     subgraph Trigger[Trigger]
         Config[subscribe: POST /users]
     end
     subgraph Engine[Engine]
         Fn["(target_function, payload)"]
     end
-    Trigger -->|calls| Engine
+    Trigger -->|"(create_user, payload)"| Engine
+    subgraph Worker[Worker]
+        Fn2[Function]
+        Fn3[Function]
+        Fn4[Function]
+    end
+Engine -->|"(create_user, payload, context)"| Worker
 ```
+
+<Callout title="Context" type="info">
+  In addition to orchestration the Engine also keeps track of the system's Context. This is what enables application
+  developers to have a shared context and access anything that the Engine has access to.
+</Callout>
