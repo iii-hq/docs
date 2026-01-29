@@ -5,3 +5,28 @@ title: 'Workers'
 When the Engine sends a Worker a request the Worker then executes that request and routes it to the correct Function. When the Function is done with its work it may optionally return a result to the Worker. If it does the Worker forwards this result back to the Engine as a new Event and the lifecycle of a iii operation starts over again.
 
 Workers encapsulate the actual components of a iii application. A Worker can be anything from a single serverless function to a collection of long running processes split across multiple cloud providers, or a kvstore running in a server rack. They're unbounded in what they can represent and as such can enable any sort of application architecture, in any number of programming languages, and with any combination of dependencies, services, and integrations.
+
+```mermaid
+graph TB
+    Event((Event<br/>POST /users)) -->|POST /users| Trigger
+
+    subgraph Trigger[Trigger]
+        Config[subscribe: POST /users]
+    end
+
+    Trigger -->|"(create_user, payload)"| Engine[Engine]
+
+    Engine -->|"(create_user, payload, context)"| Function
+
+    subgraph Worker[Worker]
+        Function[Function: create_user]
+        Function --> P1
+        subgraph P1[Process Request]
+            P2[Emit Events]
+        end
+        P1 --> P3[Return Response]
+    end
+
+    P2 -.->|"events<br/>(optional)"| Engine
+    P3 -->|"response<br/>(optional)"| Engine
+```
