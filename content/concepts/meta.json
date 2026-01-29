@@ -1,4 +1,4 @@
 {
   "title": "Concepts",
-  "pages": ["triggers", "functions"]
+  "pages": ["events", "triggers", "functions"]
 }
