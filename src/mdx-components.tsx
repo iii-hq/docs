@@ -27,6 +27,8 @@ import { Mermaid } from './lib/components/Mermaid'
 import { ResponseField } from './lib/components/ResponseField'
 import { Tip } from './lib/components/Tip'
 import { Warning } from './lib/components/Warning'
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock'
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
 
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {
@@ -58,5 +60,8 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     Cog,
     Handshake,
     LayoutTemplate,
+    DynamicCodeBlock,
+    Tab,
+    Tabs,
   }
 }
