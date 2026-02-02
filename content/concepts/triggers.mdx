@@ -2,18 +2,27 @@
 title: 'Triggers'
 ---
 
-Triggers subscribe to and define triggering conditions for events. When the Trigger's conditions are met it informs the iii engine that Function(s) need to be called with the payload of the event.
+Triggers are the entrypoint of a iii-powered application.
 
-From the application developer standpoint it functions something like this. Although there are a few more layers inbetween.
+Each Trigger defines the conditions which will cause it to fire, a payload it accepts, and a Function that it will invoke. When the Trigger does fire the Function is invoked with that payload.
+
+From the application developer standpoint it functions something like this. Although there are a few more layers inbetween and Functions are a more abstract concept within iii.
 
 ```mermaid
 graph LR
-    Event((Event<br/>POST /users)) -->|fires| Trigger
+    User((User)) -->|invokes| Trigger
+
     subgraph Trigger[Trigger]
-        Config[subscribe: POST /users]
+        Config[POST /users]
     end
     subgraph Function[Function]
         Fn[create_user]
     end
     Trigger -->|calls| Function
 ```
+
+<Callout title="Unrolling the backend" type="info">
+  Due to the way iii is structured there can be any amount of "entrypoints" into a iii application. This makes
+  modification simpler, reduces complexity, and allows the adoption of any programming pattern into an existing
+  application.
+</Callout>
