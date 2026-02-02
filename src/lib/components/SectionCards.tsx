@@ -1,16 +1,13 @@
-import type { PageTree } from "fumadocs-core/page-tree";
+import type { Folder, Item, Node, Root } from "fumadocs-core/page-tree";
 import { Cards } from "fumadocs-ui/components/card";
 import { Card } from "./Card";
 
 type Props = {
-  tree: PageTree.Root;
+  tree: Root;
   slugs: string[];
 };
 
-function findFolder(
-  nodes: PageTree.Node[],
-  slugs: string[],
-): PageTree.Folder | null {
+function findFolder(nodes: Node[], slugs: string[]): Folder | null {
   for (const node of nodes) {
     if (node.type === "folder") {
       // Check if this folder's index matches our slugs
@@ -35,7 +32,7 @@ export function SectionCards({ tree, slugs }: Props) {
 
   // Get page children (not nested folders)
   const pages = folder.children.filter(
-    (child): child is PageTree.Item => child.type === "page",
+    (child): child is Item => child.type === "page",
   );
 
   if (pages.length === 0) return null;
