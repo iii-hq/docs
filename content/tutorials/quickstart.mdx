@@ -9,15 +9,20 @@ The iii SDK is the base SDK for building iii applications. It provides the core 
 
 <Tabs items={['Node', 'Python']} groupId="language" persist>
   <Tab value="Node">
-    <DynamicCodeBlock lang="bash" code="npm install @iii-dev/sdk" />
+
+```bash
+npm install @iii-dev/sdk
+```
+
   </Tab>
   <Tab value="Python">
-    <DynamicCodeBlock
-      lang="bash"
-      code={`uv pip install iii-sdk
+
+```bash
+uv pip install iii-sdk
 # or
-pip install iii-sdk`}
-    />
+pip install iii-sdk
+```
+
   </Tab>
 </Tabs>
 
@@ -25,22 +30,29 @@ pip install iii-sdk`}
 
 Run `iii` command line, this will start the iii process.
 
-<DynamicCodeBlock lang="bash" code="iii" />
+```bash
+iii
+```
 
 <Tabs items={['Node', 'Python']} groupId="language" persist>
   <Tab value="Node">
-    <DynamicCodeBlock lang="typescript" code={`import { Bridge } from '@iii-dev/sdk'
 
-const bridge = new Bridge(process.env.III_BRIDGE_URL ?? 'ws://localhost:49134')`} />
+```typescript
+import { Bridge } from '@iii-dev/sdk'
+
+const bridge = new Bridge(process.env.III_BRIDGE_URL ?? 'ws://localhost:49134')
+```
 
   </Tab>
   <Tab value="Python">
-    <DynamicCodeBlock lang="python" code={`import asyncio
+
+```python
+import asyncio
 import os
 from iii import Bridge
 
 async def main() -> None:
-bridge = Bridge(os.getenv("III_BRIDGE_URL", "ws://localhost:49134"))
+    bridge = Bridge(os.getenv("III_BRIDGE_URL", "ws://localhost:49134"))
 
     @bridge.function("greet.hello")
     async def hello(data):
@@ -50,8 +62,9 @@ bridge = Bridge(os.getenv("III_BRIDGE_URL", "ws://localhost:49134"))
     await bridge.connect()
     await asyncio.Event().wait()
 
-if **name** == "**main**":
-asyncio.run(main())`} />
+if __name__ == "__main__":
+    asyncio.run(main())
+```
 
   </Tab>
 </Tabs>
