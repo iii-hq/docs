@@ -116,9 +116,9 @@ docker compose up -d
 | 3112  | Streams API                |
 | 9464  | Prometheus metrics         |
 
-### Docker Compose (Recommended Production Setup)
+### Docker Compose (Production Example)
 
-For production, we recommend using `docker-compose.prod.yml` which adds a Caddy reverse proxy for automatic HTTPS, password-protected Redis, and container resource limits. This is the setup we suggest for most deployments.
+The included `docker-compose.prod.yml` adds a [Caddy](https://caddyserver.com/docs/) reverse proxy for TLS, password-protected Redis, and container resource limits.
 
 **1. Create an `.env` file with your secrets:**
 
@@ -148,100 +148,73 @@ your-domain.com {
 }
 ```
 
-Caddy automatically obtains and renews Let's Encrypt TLS certificates.
+See the [Caddy documentation](https://caddyserver.com/docs/) for TLS and reverse proxy configuration.
 
-**3. Start the production stack:**
+**3. Start the stack:**
 
 ```bash
 docker compose -f docker-compose.prod.yml up -d
 ```
 
-<Callout type="info">
-DNS must point to your server before starting Caddy. Let's Encrypt validates domain ownership via HTTP challenge on port 80.
-</Callout>
+## Reverse Proxy Examples
 
-## TLS / Reverse Proxy
+The iii engine does not handle TLS itself. Place a reverse proxy in front of it to terminate TLS. Below are minimal examples for [Caddy](https://caddyserver.com/docs/) and [Nginx](https://nginx.org/en/docs/).
 
-We recommend terminating TLS at a reverse proxy in front of the iii engine rather than exposing it directly to the internet.
+### Caddy
 
-### Caddy (Recommended)
+```
+your-domain.com {
+    handle /api/* {
+        reverse_proxy 127.0.0.1:3111
+    }
+    handle /streams/* {
+        reverse_proxy 127.0.0.1:3112
+    }
+    handle /ws {
+        reverse_proxy 127.0.0.1:49134
+    }
+    handle {
+        reverse_proxy 127.0.0.1:3111
+    }
+}
+```
 
-The production Docker Compose includes Caddy, which we recommend for most users because it handles:
-- TLS certificate provisioning and renewal via Let's Encrypt
-- HTTP → HTTPS redirect
-- WebSocket proxying with upgrade headers
-- Security headers (HSTS, X-Frame-Options, X-Content-Type-Options)
-
-The `Caddyfile` in the repository is ready to use — just replace the domain placeholder.
-
-### Nginx Alternative
-
-If you prefer Nginx, here's an equivalent configuration:
+### Nginx
 
 ```nginx
 server {
-    listen 80;
-    server_name your-domain.com;
-    return 301 https://$host$request_uri;
-}
-
-server {
-    listen 443 ssl http2;
+    listen 443 ssl;
     server_name your-domain.com;
 
-    ssl_certificate /etc/letsencrypt/live/your-domain.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/your-domain.com/privkey.pem;
-
-    # REST API
     location /api/ {
         proxy_pass http://127.0.0.1:3111;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    # Worker WebSocket
     location /ws {
         proxy_pass http://127.0.0.1:49134;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
-        proxy_read_timeout 86400s;
     }
 
-    # Streams API
     location /streams/ {
         proxy_pass http://127.0.0.1:3112;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
     }
 
-    # Default to REST API
     location / {
         proxy_pass http://127.0.0.1:3111;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
     }
 }
 ```
 
-<Callout type="warn">
-With Nginx you must manage certificate renewal yourself (e.g., via certbot). Caddy handles this automatically.
-</Callout>
+See the [Nginx documentation](https://nginx.org/en/docs/) for SSL, header, and proxy configuration.
 
-### Certificate Management
+## Production Configuration
 
-- **Caddy**: Fully automatic. Certificates are stored in the `caddy_data` Docker volume.
-- **Let's Encrypt + certbot**: Run `certbot renew` on a cron schedule. Ensure port 80 is reachable for HTTP-01 challenges.
-- **Custom CA / self-signed**: Mount your cert and key files into the reverse proxy container.
-
-## Recommended Production Configuration
-
-Here's the configuration we recommend for production deployments with all common modules:
+Example configuration with all common modules:
 
 ```yaml
 modules:
@@ -298,13 +271,11 @@ modules:
           redis_url: ${REDIS_URL:redis://localhost:6379}
 ```
 
-## Recommended Production Checklist
-
-The following practices are recommended for hardening your iii deployment.
+## Production Checklist
 
 ### Security Hardening
 
-We recommend running the iii container with minimal privileges:
+Running the iii container with minimal privileges:
 
 ```bash
 docker run --read-only --tmpfs /tmp \
@@ -314,7 +285,6 @@ docker run --read-only --tmpfs /tmp \
   iiidev/iii:latest
 ```
 
-Recommended practices:
 - **Read-only filesystem** (`--read-only`): Prevents writes to the container filesystem
 - **Drop all capabilities** (`--cap-drop=ALL`): Minimizes kernel access
 - **No new privileges** (`--security-opt=no-new-privileges:true`): Prevents privilege escalation
@@ -322,7 +292,7 @@ Recommended practices:
 
 ### Environment Variables for Secrets
 
-We strongly recommend keeping secrets out of version control. Use `.env` files or a secrets manager:
+Keep secrets out of version control. Use `.env` files or a secrets manager:
 
 ```bash
 REDIS_PASSWORD=<generated-password>
@@ -343,8 +313,6 @@ The engine exposes Prometheus metrics on port `9464`:
 ```bash
 curl http://localhost:9464/metrics
 ```
-
-In the production Docker Compose, Caddy proxies metrics on an internal-only port (`9180`). Configure your monitoring stack (Prometheus, Grafana) to scrape from there.
 
 Health check endpoints:
 
