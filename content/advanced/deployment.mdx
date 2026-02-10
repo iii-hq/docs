@@ -118,26 +118,14 @@ docker compose up -d
 
 ### Docker Compose (Production Example)
 
-The included `docker-compose.prod.yml` adds a [Caddy](https://caddyserver.com/docs/) reverse proxy for TLS, password-protected Redis, and container resource limits.
+The included `docker-compose.prod.yml` runs iii behind a [Caddy](https://caddyserver.com/docs/) reverse proxy for TLS, using only built-in adapters.
 
-**1. Create an `.env` file with your secrets:**
-
-```bash
-REDIS_PASSWORD=your-strong-redis-password
-RABBITMQ_USER=iii
-RABBITMQ_PASS=your-strong-rabbitmq-password
-FRONTEND_URL=https://your-domain.com
-```
-
-**2. Edit the `Caddyfile`** — replace `your-domain.com` with your actual domain:
+**1. Edit the `Caddyfile`** — replace `your-domain.com` with your actual domain:
 
 ```
 your-domain.com {
     handle /api/* {
         reverse_proxy iii:3111
-    }
-    handle /streams/* {
-        reverse_proxy iii:3112
     }
     handle /ws {
         reverse_proxy iii:49134
@@ -150,7 +138,7 @@ your-domain.com {
 
 See the [Caddy documentation](https://caddyserver.com/docs/) for TLS and reverse proxy configuration.
 
-**3. Start the stack:**
+**2. Start the stack:**
 
 ```bash
 docker compose -f docker-compose.prod.yml up -d
@@ -214,62 +202,24 @@ See the [Nginx documentation](https://nginx.org/en/docs/) for SSL, header, and p
 
 ## Production Configuration
 
-Example configuration with all common modules:
+Example configuration using built-in adapters:
 
 ```yaml
 modules:
-  # REST API
   - class: modules::api::RestApiModule
     config:
       host: 0.0.0.0
-      port: ${API_PORT:3111}
-      cors:
-        allowed_origins:
-          - ${FRONTEND_URL:http://localhost:3000}
-        allowed_methods:
-          - GET
-          - POST
-          - PUT
-          - DELETE
-          - OPTIONS
+      port: 3111
 
-  # Streams
-  - class: modules::streams::StreamModule
-    config:
-      host: 0.0.0.0
-      port: ${STREAMS_PORT:31112}
-      auth_function: auth.verifyToken
-      adapter:
-        class: modules::streams::adapters::RedisAdapter
-        config:
-          redis_url: ${REDIS_URL:redis://localhost:6379}
-
-  # Events
-  - class: modules::event::EventModule
-    config:
-      adapter:
-        class: modules::event::adapters::RedisAdapter
-        config:
-          redis_url: ${REDIS_URL:redis://localhost:6379}
-
-  # Cron
   - class: modules::cron::CronModule
-    config:
-      adapter:
-        class: modules::cron::adapters::RedisAdapter
-        config:
-          redis_url: ${REDIS_URL:redis://localhost:6379}
 
-  # Logging
   - class: modules::observability::LoggingModule
     config:
-      level: ${LOG_LEVEL:info}
+      level: info
       format: json
-      adapter:
-        class: modules::observability::adapters::RedisLogger
-        config:
-          redis_url: ${REDIS_URL:redis://localhost:6379}
 ```
+
+Additional modules (Streams, Events, Queue) require external adapters such as Redis or RabbitMQ. See the [Configuration File](#configuration-file) section for examples.
 
 ## Production Checklist
 
@@ -290,22 +240,6 @@ docker run --read-only --tmpfs /tmp \
 - **No new privileges** (`--security-opt=no-new-privileges:true`): Prevents privilege escalation
 - **Non-root user**: The official image already runs as a non-root user
 
-### Environment Variables for Secrets
-
-Keep secrets out of version control. Use `.env` files or a secrets manager:
-
-```bash
-REDIS_PASSWORD=<generated-password>
-RABBITMQ_USER=iii
-RABBITMQ_PASS=<generated-password>
-FRONTEND_URL=https://your-domain.com
-RUST_LOG=info
-```
-
-<Callout type="warn">
-Add `.env` to your `.gitignore`. For production, use Docker secrets or a vault solution (HashiCorp Vault, AWS Secrets Manager, etc.).
-</Callout>
-
 ### Health Checks and Monitoring
 
 The engine exposes Prometheus metrics on port `9464`:
@@ -322,41 +256,6 @@ curl http://localhost:3111/health
 
 # WebSocket port
 nc -zv 127.0.0.1 49134
-```
-
-### Backup Strategy
-
-**Redis**: Enable AOF persistence (already configured in `docker-compose.prod.yml` via `--appendonly yes`) and schedule regular RDB snapshots:
-
-```bash
-# Manual backup
-docker compose -f docker-compose.prod.yml exec redis redis-cli -a $REDIS_PASSWORD BGSAVE
-
-# Copy backup file
-docker cp $(docker compose -f docker-compose.prod.yml ps -q redis):/data/dump.rdb ./backup/
-```
-
-**RabbitMQ**: Export definitions for queue/exchange configuration:
-
-```bash
-docker compose -f docker-compose.prod.yml exec rabbitmq \
-  rabbitmqctl export_definitions /tmp/definitions.json
-```
-
-### Log Aggregation
-
-The production config uses JSON log format for easy parsing. Forward logs to your aggregation platform:
-
-```bash
-# View logs
-docker compose -f docker-compose.prod.yml logs -f iii
-
-# Ship to external system (example: Loki via Docker log driver)
-# Add to docker-compose.prod.yml service:
-#   logging:
-#     driver: loki
-#     options:
-#       loki-url: "http://loki:3100/loki/api/v1/push"
 ```
 
 ## Default Modules
