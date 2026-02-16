@@ -396,7 +396,7 @@ bridge.registerFunction({
 
     // Emit completion event
     await bridge.invokeFunction({
-      function_path: 'publish',
+      function_path: 'enqueue',
       data: {
         topic: 'processing.completed',
         data: { jobId: data.id },
