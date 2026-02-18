@@ -1,20 +1,33 @@
 ---
 title: 'Call'
 description: 'Invoke any registered function from anywhere in your application.'
+hideCards: true
 ---
 
-Call runs any Function registered with the Engine. It doesn't matter where the function lives, what language it's written in, or how it was registered.
+Call runs any function registered with the Engine regardless of where it lives, what language it's written in,
+or how it was registered.
 
-The result is a unified way to invoke any functionality accessible to the Engine.
-
-<Callout title="Functions?" type="info">
-  A Function is anything that can receive a request and (optionally) return a response. Some examples that meet this
-  definition are normal methods, http endpoints, state updates, and database mutations.
-</Callout>
+Without Call, invoking a function across services means knowing its location, protocol, and interface.
+Call removes that burden by routing every invocation through the Engine, which already holds a reference to the function.
+The developer supplies the intent; the Engine handles the rest.
 
 ```mermaid
 graph LR
-    CallProcess((Call)) --> Process["create_user()"]
-    CallEndpoint((Call)) --> Endpoint["POST /user"]
-    CallState((Call)) --> State["state::set(user)"]
+    FnRef -.-> fn["function()"]
+    FnRef --> fn
+    Register["registerFunction(function)"] -.-> FnRef
+    subgraph Eng[Engine]
+        FnRef[Function Reference]:::solid
+    end
+    Caller["Caller"] --> Call((Call)) --> FnRef
+    classDef solid stroke-dasharray: 0
 ```
+
+<Cards>
+  <Card icon={<Terminal />} title="Quickstart" href={`/docs/tutorials/quickstart`}>
+    Build your first application and see Call and Function Registration in action.
+  </Card>
+  <Card icon={<LayoutTemplate />} title="Registration" href={`/docs/concepts/registration`}>
+    Learn how functions become available to the Engine for Call to invoke.
+  </Card>
+</Cards>
