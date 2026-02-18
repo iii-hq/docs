@@ -62,6 +62,9 @@ This module adds a new Trigger Type: `http`.
   <ResponseField name="http_method" type="string" required>
     The HTTP method of the API.
   </ResponseField>
+  <ResponseField name="_condition_path" type="string">
+    Function ID for conditional execution. The engine invokes it with the request; if it returns `false`, the handler is skipped.
+  </ResponseField>
 </Expandable>
 
 ### Sample code

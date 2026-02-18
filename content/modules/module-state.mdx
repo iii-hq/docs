@@ -263,6 +263,57 @@ iii.registerTrigger({
 })
 ```
 
+### Usage Example: User Profile with Reactive Sync
+
+Store user profiles in state and react when they change:
+
+```typescript
+await iii.call('state::set', {
+  scope: 'users',
+  key: 'user-123',
+  data: { name: 'Alice', email: 'alice@example.com', preferences: { theme: 'dark' } },
+})
+
+const profile = await iii.call('state::get', { scope: 'users', key: 'user-123' })
+
+await iii.call('state::set', {
+  scope: 'users',
+  key: 'user-123',
+  data: { name: 'Alice', email: 'alice@example.com', preferences: { theme: 'light' } },
+})
+
+const allUsers = await iii.call('state::list', { scope: 'users' })
+const scopes = await iii.call('state::list_groups', {})
+```
+
+### Usage Example: Conditional Trigger
+
+Only process profile updates when the email field changed:
+
+```typescript
+const conditionFn = iii.registerFunction(
+  { id: 'conditions.emailChanged' },
+  async (event) =>
+    event.event_type === 'state:updated' &&
+    event.old_value?.email !== event.new_value?.email,
+)
+
+const fn = iii.registerFunction({ id: 'state.onEmailChange' }, async (event) => {
+  await sendVerificationEmail(event.new_value.email)
+  return {}
+})
+
+iii.registerTrigger({
+  type: 'state',
+  function_id: fn.id,
+  config: {
+    scope: 'users',
+    key: 'profile',
+    condition_function_id: conditionFn.id,
+  },
+})
+```
+
 ## State Flow
 
 ```mermaid

@@ -71,6 +71,9 @@ This Module adds a new Trigger Type: `cron`.
     ```
 
   </ResponseField>
+  <ResponseField name="condition_function_id" type="string">
+    Function ID for conditional execution. The engine invokes it with the cron event; if it returns `false`, the handler is skipped.
+  </ResponseField>
 </Expandable>
 
 ### Sample Code

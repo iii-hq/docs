@@ -49,6 +49,8 @@ Executes functions in response to HTTP requests.
 
 **Output**: `ApiResponse` with status_code, body, headers
 
+**Conditions**: Optional. Add `_condition_path` to config with a function ID. The engine invokes it before the handler; if it returns `false`, the handler is skipped. See [Trigger Conditions](/docs/using/triggers#trigger-conditions).
+
 <Card icon={<Globe />} title="REST API Module" href="/docs/modules/module-rest-api">
   Learn more about the API trigger
 </Card>
@@ -77,6 +79,8 @@ Executes functions when events are published to subscribed topics.
 
 **Output**: Function result (optional, fire-and-forget pattern supported)
 
+**Conditions**: Optional. Add `_condition_path` to config. See [Trigger Conditions](/docs/using/triggers#trigger-conditions).
+
 <Card icon={<Zap />} title="Queue Module" href="/docs/modules/module-queue">
   Learn more about the Queue trigger
 </Card>
@@ -104,6 +108,8 @@ Executes functions on a time-based schedule using cron expressions.
 **Input**: Cron execution context (timestamp, trigger info)
 
 **Output**: Function result
+
+**Conditions**: Optional. Add `condition_function_id` to config. See [Trigger Conditions](/docs/using/triggers#trigger-conditions).
 
 <Card icon={<Clock />} title="Cron Module" href="/docs/modules/module-cron">
   Learn more about the Cron trigger
@@ -164,6 +170,8 @@ Executes functions when clients connect to or disconnect from streams.
 **Input**: Subscription info with stream_name, group_id, item_id, context
 
 **Output**: Function result (useful for access control, analytics)
+
+**Conditions**: Optional. Add `condition_function_id` to config for stream:join/stream:leave. See [Trigger Conditions](/docs/using/triggers#trigger-conditions).
 
 <Card icon={<Activity />} title="Stream Module" href="/docs/modules/module-stream">
   Learn more about Stream triggers

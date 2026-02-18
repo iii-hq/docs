@@ -175,6 +175,98 @@ iii.registerTrigger({
 
 **Use Case**: Send notifications via API calls, events, or scheduled jobs using the same logic.
 
+## Trigger Conditions
+
+Triggers can optionally use a **condition function** to decide whether the handler should run. The engine invokes the condition with the trigger payload before the main handler. If it returns `false`, the handler is not invoked.
+
+**Supported trigger types**: http, queue, cron, stream, state
+
+### How It Works
+
+1. Register a condition function that receives the same input as the handler and returns a boolean.
+2. Add `condition_function_id` to the trigger config (or `_condition_path` for http/queue triggers).
+3. When the trigger fires, the engine calls the condition first. Only if it returns truthy does the handler run.
+
+### Example: HTTP Trigger with Condition
+
+```typescript
+const conditionFn = iii.registerFunction(
+  { id: 'conditions.requireVerified' },
+  async (req) => req.headers?.['x-verified'] === 'true',
+)
+
+const fn = iii.registerFunction({ id: 'api.verifiedOnly' }, async (req) => ({
+  status_code: 200,
+  body: { message: 'Verified request' },
+}))
+
+iii.registerTrigger({
+  type: 'http',
+  function_id: fn.id,
+  config: {
+    api_path: '/verified',
+    http_method: 'POST',
+    _condition_path: conditionFn.id,
+  },
+})
+```
+
+### Example: Queue Trigger with Condition
+
+```typescript
+const conditionFn = iii.registerFunction(
+  { id: 'conditions.highValue' },
+  async (data) => (data?.amount ?? 0) > 1000,
+)
+
+const fn = iii.registerFunction({ id: 'orders.processHighValue' }, async (order) => {
+  await processHighValueOrder(order)
+  return {}
+})
+
+iii.registerTrigger({
+  type: 'queue',
+  function_id: fn.id,
+  config: {
+    topic: 'order.placed',
+    _condition_path: conditionFn.id,
+  },
+})
+```
+
+### Example: State Trigger with Condition
+
+```typescript
+const conditionFn = iii.registerFunction(
+  { id: 'conditions.profileChanged' },
+  async (event) => event.event_type === 'state:updated' && event.key === 'profile',
+)
+
+const fn = iii.registerFunction({ id: 'state.onProfileUpdate' }, async (event) => {
+  console.log('Profile updated:', event.new_value)
+  return {}
+})
+
+iii.registerTrigger({
+  type: 'state',
+  function_id: fn.id,
+  config: {
+    scope: 'users',
+    condition_function_id: conditionFn.id,
+  },
+})
+```
+
+### Config Keys by Trigger Type
+
+| Trigger Type | Condition Config Key |
+|--------------|----------------------|
+| http | `_condition_path` |
+| queue | `_condition_path` |
+| cron | `condition_function_id` |
+| stream, stream:join, stream:leave | `condition_function_id` |
+| state | `condition_function_id` |
+
 ## Trigger Lifecycle
 
 ```mermaid
@@ -345,5 +437,8 @@ iii.registerTrigger({
   </Card>
   <Card icon={<Parentheses />} title="Remote Functions" href="/docs/remote-functions">
     Understand how to write functions
+  </Card>
+  <Card icon={<Filter />} title="Trigger Conditions" href="/docs/using/triggers#trigger-conditions">
+    Filter when handlers run with conditions
   </Card>
 </Columns>
