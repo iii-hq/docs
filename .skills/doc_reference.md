@@ -1,3 +1,8 @@
+---
+name: doc_reference
+description: Writing guide for Reference documentation — information-oriented content that accurately and completely describes the technical machinery of the software. Use when the reader needs to look something up, not learn or accomplish a task.
+---
+
 # Skill: Writing Technical Reference (Information-Oriented)
 
 **Goal**: Describe the machinery accurately.

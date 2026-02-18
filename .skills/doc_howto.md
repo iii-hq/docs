@@ -1,3 +1,8 @@
+---
+name: doc_howto
+description: Writing guide for How-to Guide documentation — task-oriented content for users who already know the basics and need to accomplish a specific, well-defined goal. Use when the reader knows what they want to do but not how to do it.
+---
+
 # Skill: Writing How-to Guides (Problem-Oriented)
 
 **Goal**: Show the user how to solve a specific problem they already have.
