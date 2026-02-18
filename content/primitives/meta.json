@@ -1,4 +1,4 @@
 {
   "title": "Primitives",
-  "pages": ["triggers", "functions", "engine", "workers", "modules", "context"]
+  "pages": ["functions", "context", "triggers", "engine", "workers", "modules"]
 }
