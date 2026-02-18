@@ -20,8 +20,10 @@ When a Trigger is Registered to a function then that function can become callabl
 graph LR
     FnRef -.-> fn["function()"]
     Register["registerFunction(function)"] -.-> FnRef
+    Get["GET /health"] --> Trigger --> FnRef
     subgraph Eng[Engine]
         FnRef[Function Reference]:::solid
+        Trigger[Trigger]:::solid
     end
     classDef solid stroke-dasharray: 0
 ```
