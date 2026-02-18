@@ -8,7 +8,7 @@ Call runs any function registered with the Engine regardless of where it lives, 
 or how it was registered.
 
 Without Call, invoking a function across services means knowing its location, protocol, and interface.
-Call removes that burden by routing every invocation through the Engine, which already holds a reference to the function.
+Call removes that burden by routing every invocation through the Engine, which already holds a reference to the function and its interface.
 The developer supplies the intent; the Engine handles the rest.
 
 ```mermaid
@@ -21,6 +21,22 @@ graph LR
     end
     Caller["Caller"] --> Call((Call)) --> FnRef
     classDef solid stroke-dasharray: 0
+```
+
+```typescript
+import { init } from "iii-sdk";
+
+const { call } = init("ws://localhost:49134");
+
+// Call functions in other services asynchronously without knowing their location, protocol,
+// or locally redefining its interface.
+const dataRequest = call("data-service::transform", { data });
+const computeRequest = call("compute-service::compute", { n });
+
+const [dataResult, computeResult] = await Promise.allSettled([
+  dataRequest,
+  computeRequest,
+]);
 ```
 
 <Cards>

@@ -10,9 +10,11 @@ Registration is dynamic and the iii engine is the long running daemon that enabl
 This mechanism is also what enables existing systems to be dynamically linked to iii without modifying them.
 A legacy API, serverless function, or a simple local function all become the same interoperable "thing".
 
-The most common type of registration an application developer will encounter is **Function Registration**.
+The most common types of registration an application developer will encounter are **Function Registration** and **Trigger Registration**.
 Once a function is registered, the iii engine stores a reference to it.
 This reference is what makes any function callable from anywhere in the backend, across domains, languages, and services.
+
+When a Trigger is Registered to a function then that function can become callable from outside the engine, such as over HTTP.
 
 ```mermaid
 graph LR
@@ -23,6 +25,25 @@ graph LR
     end
     classDef solid stroke-dasharray: 0
 ```
+
+```typescript
+import { init } from "iii-sdk";
+
+const { registerFunction, registerTrigger } = init("ws://localhost:49134");
+
+// Registering a function with the Engine makes it instantly available across the application
+const health = registerFunction({ id: "client::health" }, async () => {
+  return { status: 200, body: { healthy: true } };
+});
+
+// Attaching a trigger to a function makes it reachable from outside the application
+registerTrigger({
+  type: "http",
+  function_id: health.id,
+  config: { api_path: "/health", http_method: "GET" },
+});
+```
+
 <Callout title="Other registration types" type="info">
   iii supports additional registration types beyond Function Registration such as for Workers and other engine-level constructs.
   Function Registration is all that's required for application development.
