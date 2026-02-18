@@ -1,24 +1,23 @@
 ---
-title: 'Streams'
+title: 'Stream'
 description: 'Build durable streams for real-time data subscriptions.'
 ---
 
 Durable streams for real-time data subscriptions.
 
 ```
-modules::streams::StreamModule
+modules::stream::StreamModule
 ```
 
 ## Sample Configuration
 
 ```yaml
-- class: modules::streams::StreamModule
+- class: modules::stream::StreamModule
   config:
-    port: ${STREAMS_PORT:31112}
+    port: ${STREAM_PORT:3112}
     host: 0.0.0.0
-    auth_function: motia.streams.authenticate
     adapter:
-      class: modules::streams::adapters::RedisAdapter
+      class: modules::stream::adapters::RedisAdapter
       config:
         redis_url: ${REDIS_URL:redis://localhost:6379}
 ```
@@ -26,7 +25,7 @@ modules::streams::StreamModule
 ## Configuration
 
 <ResponseField name="port" type="number">
-  The port to listen on. Defaults to `31112`.
+  The port to listen on. Defaults to `3112`.
 </ResponseField>
 
 <ResponseField name="host" type="string">
@@ -45,13 +44,12 @@ modules::streams::StreamModule
 
 ## Adapters
 
-### modules::streams::adapters::RedisAdapter
+### modules::stream::adapters::RedisAdapter
 
-Uses Redis as the backend for the streams. This will use the key/value store to store the streams data and also leverage
-Redis Pub/Sub to publish and subscribe to the streams.
+Uses Redis as the backend for the streams. Stores stream data in Redis and leverages Redis Pub/Sub for real-time event delivery.
 
 ```yaml
-class: modules::streams::adapters::RedisAdapter
+class: modules::stream::adapters::RedisAdapter
 config:
   redis_url: ${REDIS_URL:redis://localhost:6379}
 ```
@@ -62,13 +60,12 @@ config:
   The URL of the Redis instance to use.
 </ResponseField>
 
-### modules::streams::adapters::KvStore
+### modules::stream::adapters::KvStore
 
-Uses Redis as the backend for the streams. This will use the key/value store to store the streams data and also leverage
-Redis Pub/Sub to publish and subscribe to the streams.
+Built-in key-value store. Supports in-memory or file-based persistence. No external dependencies required.
 
 ```yaml
-class: modules::streams::adapters::KvStore
+class: modules::stream::adapters::KvStore
 config:
   store_method: file_based
   file_path: ./data/streams_store.db
@@ -77,11 +74,11 @@ config:
 #### Configuration
 
 <ResponseField name="store_method" type="string">
-  This will discribe what store_method you want, the options are: - in_memory - file_based
+  Storage method. Options: `in_memory` (lost on restart) or `file_based` (persisted to disk).
 </ResponseField>
 
 <ResponseField name="file_path" type="string">
-  if you choose file_base method of storage, we can provide the file with path where you want to save and read it.
+  Directory path for file-based storage. Each stream is stored as a separate file.
 </ResponseField>
 ## Functions
 
@@ -201,34 +198,25 @@ It's possible to implement a function to handle authentication.
 </Expandable>
 
 ```typescript
-function onAuth(input: StreamAuthInput) {
-  console.log('Authenticated request', input)
-
-  return {
-    context: { name: 'John Doe' },
-  }
-}
-
-bridge.registerFunction({
-  function_path: 'onAuth',
-  handler: onAuth,
-})
+iii.registerFunction({ id: 'onAuth' }, (input) => ({
+  context: { name: 'John Doe' },
+}))
 ```
 
 2. Make sure you add the function to the configuration file.
 
 ```yaml
-- class: modules::streams::StreamModule
+- class: modules::stream::StreamModule
   config:
-    auth_function: onAuth # Same name as the function you registered
+    auth_function: onAuth
 ```
 
 3. Now whenever someone opens a websocket connection, the function `onAuth` will be called with the request data.
 
 ## Trigger Types
 
-Two new trigger types are added to the iii SDK: `streams:join` and `streams:leave`.
-Both have the same parameters when invoked.
+This module adds three trigger types: `stream` (item changes), `stream:join` (WebSocket connect), and `stream:leave` (WebSocket disconnect).
+Join and leave triggers receive the same payload shape when invoked.
 
 <ResponseField name="subscription_id" type="string" required>
   The subscription ID, mostly used for uniqueness or logging purposes.
@@ -249,25 +237,14 @@ Both have the same parameters when invoked.
 ### Sample Code
 
 ```typescript
-type JoinInput<TContext = object> = {
-  subscription_id: string
-  stream_name: string
-  group_id: string
-  id: string
-  context: TContext
-}
-
-function onJoin(input: JoinInput<any>) {
+const fn = iii.registerFunction({ id: 'onJoin' }, (input) => {
   console.log('Joined stream', input)
-}
-
-bridge.registerFunction({
-  function_path: 'onJoin',
-  handler: onJoin,
+  return {}
 })
 
-bridge.registerTrigger({
-  trigger_type: 'streams:join',
-  function_path: 'onJoin',
+iii.registerTrigger({
+  type: 'stream:join',
+  function_id: fn.id,
+  config: {},
 })
 ```
