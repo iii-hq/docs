@@ -5,24 +5,14 @@ import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { SidebarItem } from "./SidebarItem";
 
-const isPathMatch = (pathname: string, itemUrl: string): boolean => {
-  return pathname === itemUrl || pathname.startsWith(`${itemUrl}/`);
-};
+const isPathActive = (pathname: string, url: string): boolean =>
+  pathname === url || (url !== "/" && pathname.startsWith(`${url}/`));
 
 const hasActivePath = (pathname: string, folder: Folder): boolean => {
-  if (folder.index && isPathMatch(pathname, folder.index.url)) {
-    return true;
-  }
-
+  if (folder.index && isPathActive(pathname, folder.index.url)) return true;
   return folder.children.some((child) => {
-    if (child.type === "page") {
-      return isPathMatch(pathname, child.url);
-    }
-
-    if (child.type === "folder") {
-      return hasActivePath(pathname, child);
-    }
-
+    if (child.type === "page") return isPathActive(pathname, child.url);
+    if (child.type === "folder") return hasActivePath(pathname, child);
     return false;
   });
 };
@@ -32,12 +22,12 @@ export const SidebarFolder: React.FC<{ item: Folder; depth?: number }> = ({
   depth = 0,
 }) => {
   const pathname = usePathname();
-  const isIndexActive = item.index ? isPathMatch(pathname, item.index.url) : false;
   const isSectionActive = useMemo(
     () => hasActivePath(pathname, item),
     [pathname, item],
   );
-  const [isOpen, setIsOpen] = useState<boolean>(isSectionActive);
+  const defaultOpen = item.defaultOpen ?? isSectionActive;
+  const [isOpen, setIsOpen] = useState<boolean>(defaultOpen);
 
   useEffect(() => {
     if (isSectionActive) {
@@ -68,18 +58,27 @@ export const SidebarFolder: React.FC<{ item: Folder; depth?: number }> = ({
             href={item.index.url}
             className={[
               "w-full rounded-md px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] transition-colors",
-              isIndexActive
+              isSectionActive
                 ? "bg-primary/10 text-foreground"
                 : "text-foreground/85 hover:bg-muted-background/50 hover:text-foreground",
             ].join(" ")}
-            aria-current={isIndexActive ? "page" : undefined}
+            aria-current={isSectionActive ? "true" : undefined}
           >
             {item.name}
           </Link>
         ) : (
-          <div className="w-full rounded-md px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-foreground/85">
+          <button
+            type="button"
+            onClick={() => setIsOpen((prev) => !prev)}
+            className={[
+              "w-full rounded-md px-2 py-1 text-left text-[11px] font-semibold uppercase tracking-[0.08em] transition-colors",
+              isSectionActive
+                ? "bg-primary/10 text-foreground"
+                : "text-foreground/85 hover:bg-muted-background/50 hover:text-foreground",
+            ].join(" ")}
+          >
             {item.name}
-          </div>
+          </button>
         )}
       </div>
       {isOpen ? (
