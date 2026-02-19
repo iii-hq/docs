@@ -1,4 +1,5 @@
 {
   "title": "API Reference",
+  "defaultOpen": false,
   "pages": ["iii-sdk"]
 }

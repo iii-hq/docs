@@ -1,5 +1,6 @@
 {
   "title": "Advanced",
+  "defaultOpen": false,
   "pages": [
     "architecture",
     "deployment",
