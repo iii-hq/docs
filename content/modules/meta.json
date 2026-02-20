@@ -1,11 +1,14 @@
 {
   "title": "Modules",
+  "defaultOpen": true,
   "pages": [
     "module-rest-api",
     "module-queue",
     "module-cron",
-    "module-logging",
+    "module-observability",
     "module-stream",
+    "module-state",
+    "module-pubsub",
     "module-kv-server",
     "module-exec",
     "module-bridge"
