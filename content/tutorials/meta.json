@@ -1,5 +1,5 @@
 {
   "title": "Tutorials",
-  "defaultOpen": false,
+  "defaultOpen": true,
   "pages": ["quickstart"]
 }
