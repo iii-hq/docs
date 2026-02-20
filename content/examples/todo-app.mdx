@@ -293,7 +293,7 @@ iii.register_trigger("http", "api.post.todo", json!({
 
 ```typescript
 iii.registerFunction(
-  { id: 'api.put.todo/:id', description: 'Update a todo' },
+  { id: 'api.put.todo', description: 'Update a todo' },
   async (req: ApiRequest) => {
     const ctx = getContext()
     const todoId = req.path_params?.id
@@ -326,7 +326,7 @@ iii.registerFunction(
 
 iii.registerTrigger({
   type: 'http',
-  function_id: 'api.put.todo/:id',
+  function_id: 'api.put.todo',
   config: { api_path: 'todo/:id', http_method: 'PUT', description: 'Update a todo' },
 })
 ```

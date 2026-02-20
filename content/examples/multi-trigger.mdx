@@ -11,7 +11,7 @@ graph LR
     Client -->|"POST /orders/manual"| Handler
     Queue -->|"topic: order.created"| Handler
     Cron -->|"every minute"| Handler
-    Handler -->|"queue::emit: order.processed"| Downstream
+    Handler -->|"queue::enqueue: order.processed"| Downstream
 ```
 
 ## Register one function, three triggers
@@ -42,7 +42,7 @@ iii.registerFunction(
         data: { id: orderId, ...req.body, source: 'api', createdAt: new Date().toISOString() },
       })
 
-      await iii.call('queue::emit', {
+      await iii.call('queue::enqueue', {
         topic: 'order.processed',
         data: { orderId, source: 'api' },
       })
@@ -63,7 +63,7 @@ iii.registerFunction(
         data: { id: orderId, amount, description, source: 'queue', createdAt: new Date().toISOString() },
       })
 
-      await iii.call('queue::emit', {
+      await iii.call('queue::enqueue', {
         topic: 'order.processed',
         data: { orderId, amount, source: 'queue' },
       })
@@ -79,7 +79,7 @@ iii.registerFunction(
     })
 
     for (const order of pendingOrders ?? []) {
-      await iii.call('queue::emit', {
+      await iii.call('queue::enqueue', {
         topic: 'order.processed',
         data: { orderId: order.id, amount: order.amount, source: 'cron' },
       })
@@ -132,7 +132,7 @@ async def orders_handle(data, ctx) -> dict | None:
             "key": order_id,
             "data": {**req.body, "id": order_id, "source": "api"},
         })
-        await iii.call("queue::emit", {
+        await iii.call("queue::enqueue", {
             "topic": "order.processed",
             "data": {"orderId": order_id, "source": "api"},
         })
@@ -153,7 +153,7 @@ async def orders_handle(data, ctx) -> dict | None:
             "key": order_id,
             "data": {**data, "id": order_id, "source": "queue"},
         })
-        await iii.call("queue::emit", {
+        await iii.call("queue::enqueue", {
             "topic": "order.processed",
             "data": {"orderId": order_id, "source": "queue"},
         })
@@ -164,7 +164,7 @@ async def orders_handle(data, ctx) -> dict | None:
 
     pending = await iii.call("state::list", {"scope": "pending-orders"}) or []
     for order in pending:
-        await iii.call("queue::emit", {
+        await iii.call("queue::enqueue", {
             "topic": "order.processed",
             "data": {"orderId": order["id"], "source": "cron"},
         })
@@ -207,7 +207,7 @@ iii.register_function("orders.handle", |input| async move {
             "data": { "id": order_id, "source": "api", "amount": req.body["amount"] },
         }))?;
 
-        iii.call_void("queue::emit", json!({
+        iii.call_void("queue::enqueue", json!({
             "topic": "order.processed",
             "data": { "orderId": order_id, "source": "api" },
         }))?;
@@ -222,7 +222,7 @@ iii.register_function("orders.handle", |input| async move {
 
         ctx.logger.info("Processing order from queue", Some(json!({ "amount": amount })));
 
-        iii.call_void("queue::emit", json!({
+        iii.call_void("queue::enqueue", json!({
             "topic": "order.processed",
             "data": { "orderId": order_id, "source": "queue" },
         }))?;
@@ -237,7 +237,7 @@ iii.register_function("orders.handle", |input| async move {
     let orders = pending.as_array().cloned().unwrap_or_default();
 
     for order in &orders {
-        iii.call_void("queue::emit", json!({
+        iii.call_void("queue::enqueue", json!({
             "topic": "order.processed",
             "data": { "orderId": order["id"], "source": "cron" },
         }))?;
@@ -293,6 +293,6 @@ iii.register_trigger("http", "my.fn", json!({ "api_path": "events", "http_method
 
 - There is no framework-level `ctx.match()` — distinguish trigger types by inspecting the input shape at runtime.
 - HTTP trigger input always has `path_params`, `query_params`, `body`, and `headers` fields.
-- Queue trigger input is the raw event payload you published with `queue::emit`.
+- Queue trigger input is the raw event payload you published with `queue::enqueue`.
 - Cron trigger input is `null` / `None` / `json!(null)` — the invocation itself is the signal.
 - Registering the same `function_id` with multiple triggers is intentional and supported; the engine dispatches independently.

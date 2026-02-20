@@ -4,12 +4,12 @@ description: 'Schedule recurring tasks with cron expressions and fan out work th
 hideCards: true
 ---
 
-The `cron` trigger type fires a registered function on a schedule. The function receives `null` / `None` input — the invocation itself is the signal. Work is typically fanned out by calling `queue::emit` to downstream queue handlers.
+The `cron` trigger type fires a registered function on a schedule. The function receives `null` / `None` input — the invocation itself is the signal. Work is typically fanned out by calling `queue::enqueue` to downstream queue handlers.
 
 ```mermaid
 graph LR
     Cron -->|"every minute"| CronFn
-    CronFn -->|"queue::emit: job.tick"| JobHandler
+    CronFn -->|"queue::enqueue: job.tick"| JobHandler
     JobHandler -->|"logger.info"| Logs
 ```
 
@@ -29,7 +29,7 @@ iii.registerFunction(
     const ctx = getContext()
     ctx.logger.info('Periodic job fired')
 
-    await iii.call('queue::emit', {
+    await iii.call('queue::enqueue', {
       topic: 'job.tick',
       data: { firedAt: new Date().toISOString(), message: 'Periodic job executed' },
     })
@@ -57,7 +57,7 @@ iii = III(address="ws://localhost:49134", options=InitOptions(worker_name="cron-
 async def periodic_job(_data, ctx) -> None:
     ctx.logger.info("Periodic job fired")
 
-    await iii.call("queue::emit", {
+    await iii.call("queue::enqueue", {
         "topic": "job.tick",
         "data": {
             "firedAt": datetime.now(timezone.utc).isoformat(),
@@ -85,7 +85,7 @@ iii.register_function("cron.periodic_job", |_input| async move {
     let ctx = get_context();
     ctx.logger.info("Periodic job fired", None);
 
-    iii.call_void("queue::emit", json!({
+    iii.call_void("queue::enqueue", json!({
         "topic": "job.tick",
         "data": {
             "firedAt": chrono::Utc::now().to_rfc3339(),
@@ -184,7 +184,7 @@ iii.registerFunction(
       if (!order.complete && new Date() > new Date(order.shipDate)) {
         ctx.logger.warn('Order overdue', { orderId: order.id, shipDate: order.shipDate })
 
-        await iii.call('queue::emit', {
+        await iii.call('queue::enqueue', {
           topic: 'notification',
           data: {
             orderId: order.id,
@@ -232,7 +232,7 @@ async def orders_sweep(_data, ctx) -> None:
         if not complete and datetime.now(timezone.utc) > ship_date:
             ctx.logger.warn("Order overdue", {"orderId": order.get("id")})
 
-            await iii.call("queue::emit", {
+            await iii.call("queue::enqueue", {
                 "topic": "notification",
                 "data": {
                     "orderId": order.get("id"),
@@ -268,7 +268,7 @@ iii.register_function("cron.orders_sweep", |_input| async move {
             if !complete && chrono::Utc::now() > ship_date {
                 ctx.logger.warn("Order overdue", Some(json!({ "orderId": order["id"] })));
 
-                iii.call_void("queue::emit", json!({
+                iii.call_void("queue::enqueue", json!({
                     "topic": "notification",
                     "data": {
                         "orderId": order["id"],
@@ -321,5 +321,5 @@ iii uses a six-field extended cron format. The optional leading field is seconds
 ## Key concepts
 
 - The cron function receives `null` / `None` input. Never rely on input data in a cron handler.
-- Keep cron handlers lightweight. Use `queue::emit` to fan out work to queue handlers that can run in parallel.
+- Keep cron handlers lightweight. Use `queue::enqueue` to fan out work to queue handlers that can run in parallel.
 - Combine `state::list` with cron for periodic sweeps over accumulated data — the state sweep pattern above is the idiomatic approach.

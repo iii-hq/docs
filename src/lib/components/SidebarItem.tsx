@@ -2,17 +2,14 @@
 import type { Item } from "fumadocs-core/page-tree";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
-const isPageActive = (pathname: string, itemUrl: string): boolean => {
-  return pathname === itemUrl;
-};
+import { isPathMatch } from "@/lib/path";
 
 export const SidebarItem: React.FC<{ item: Item; depth?: number }> = ({
   item,
   depth = 0,
 }) => {
   const pathname = usePathname();
-  const isActive = isPageActive(pathname, item.url);
+  const isActive = isPathMatch(pathname, item.url);
   const indentation = depth > 0 ? "pl-4" : "";
 
   return (

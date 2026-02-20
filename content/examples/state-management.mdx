@@ -12,7 +12,7 @@ graph LR
     WriteHandler -->|"state::set scope=users"| StateStore[(State)]
     Cron -->|"every 5s"| AuditHandler
     AuditHandler -->|"state::list scope=orders"| StateStore
-    AuditHandler -->|"queue::emit: notification"| Notify
+    AuditHandler -->|"queue::enqueue: notification"| Notify
 ```
 
 ## Writing state
@@ -150,6 +150,10 @@ iii.registerFunction(
     const ctx = getContext()
     const userId = req.path_params?.id
 
+    if (!userId) {
+      return { status_code: 400, body: { error: 'Missing user id' } }
+    }
+
     const user = await iii.call<{ status: string } | null>('state::get', {
       scope: 'users',
       key: userId,
@@ -249,7 +253,7 @@ iii.registerFunction(
       if (!order.complete && new Date() > new Date(order.shipDate)) {
         ctx.logger.warn('Order overdue', { orderId: order.id })
 
-        await iii.call('queue::emit', {
+        await iii.call('queue::enqueue', {
           topic: 'notification',
           data: { orderId: order.id, templateId: 'order-audit-warning', status: order.status },
         })
@@ -287,7 +291,7 @@ async def orders_audit(_data, ctx) -> None:
         if not complete and datetime.now(timezone.utc) > ship_date:
             ctx.logger.warn("Order overdue", {"orderId": order.get("id")})
 
-            await iii.call("queue::emit", {
+            await iii.call("queue::enqueue", {
                 "topic": "notification",
                 "data": {"orderId": order.get("id"), "templateId": "order-audit-warning"},
             })
@@ -315,7 +319,7 @@ iii.register_function("cron.orders_audit", |_input| async move {
             if !complete && chrono::Utc::now() > ship_date {
                 ctx.logger.warn("Order overdue", Some(json!({ "orderId": order["id"] })));
 
-                iii.call_void("queue::emit", json!({
+                iii.call_void("queue::enqueue", json!({
                     "topic": "notification",
                     "data": { "orderId": order["id"], "templateId": "order-audit-warning" },
                 }))?;

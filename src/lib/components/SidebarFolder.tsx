@@ -3,15 +3,13 @@ import type { Folder } from "fumadocs-core/page-tree";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { isPathMatch } from "@/lib/path";
 import { SidebarItem } from "./SidebarItem";
 
-const isPathActive = (pathname: string, url: string): boolean =>
-  pathname === url || (url !== "/" && pathname.startsWith(`${url}/`));
-
 const hasActivePath = (pathname: string, folder: Folder): boolean => {
-  if (folder.index && isPathActive(pathname, folder.index.url)) return true;
+  if (folder.index && isPathMatch(pathname, folder.index.url)) return true;
   return folder.children.some((child) => {
-    if (child.type === "page") return isPathActive(pathname, child.url);
+    if (child.type === "page") return isPathMatch(pathname, child.url);
     if (child.type === "folder") return hasActivePath(pathname, child);
     return false;
   });
@@ -35,6 +33,7 @@ export const SidebarFolder: React.FC<{ item: Folder; depth?: number }> = ({
     }
   }, [isSectionActive]);
 
+  const panelId = `sidebar-folder-${item.$id}`;
   const indentation = depth > 0 ? "pl-4" : "";
 
   return (
@@ -44,6 +43,8 @@ export const SidebarFolder: React.FC<{ item: Folder; depth?: number }> = ({
           type="button"
           onClick={() => setIsOpen((prev) => !prev)}
           aria-expanded={isOpen}
+          aria-controls={panelId}
+          aria-label={`${isOpen ? "Collapse" : "Expand"} ${item.name}`}
           className={[
             "inline-flex h-8 w-8 items-center justify-center rounded-md text-xs transition-colors",
             isSectionActive
@@ -62,7 +63,7 @@ export const SidebarFolder: React.FC<{ item: Folder; depth?: number }> = ({
                 ? "bg-primary/10 text-foreground"
                 : "text-foreground/85 hover:bg-muted-background/50 hover:text-foreground",
             ].join(" ")}
-            aria-current={isSectionActive ? "true" : undefined}
+            aria-current={isSectionActive ? "page" : undefined}
           >
             {item.name}
           </Link>
@@ -82,7 +83,10 @@ export const SidebarFolder: React.FC<{ item: Folder; depth?: number }> = ({
         )}
       </div>
       {isOpen ? (
-        <div className="mt-2 flex w-full flex-col items-start gap-1 border-l border-border/60 pl-2">
+        <div
+          id={panelId}
+          className="mt-2 flex w-full flex-col items-start gap-1 border-l border-border/60 pl-2"
+        >
           {item.children.map((child) => {
             if (child.type === "page") {
               return <SidebarItem key={child.$id} item={child} depth={depth + 1} />;
