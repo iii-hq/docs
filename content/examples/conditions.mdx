@@ -30,14 +30,14 @@ import { init, getContext, type ApiRequest } from 'iii-sdk'
 const iii = init(process.env.III_BRIDGE_URL ?? 'ws://localhost:49134')
 
 iii.registerFunction(
-  { id: 'conditions.is_premium' },
+  { id: 'conditions::is_premium' },
   async (req: ApiRequest<{ amount: number }>) => {
     return (req.body?.amount ?? 0) > 1000
   },
 )
 
 iii.registerFunction(
-  { id: 'orders.premium', description: 'Processes premium orders' },
+  { id: 'orders::premium', description: 'Processes premium orders' },
   async (req: ApiRequest<{ amount: number; description: string }>) => {
     const ctx = getContext()
     ctx.logger.info('Processing premium order', { amount: req.body?.amount })
@@ -47,11 +47,11 @@ iii.registerFunction(
 
 iii.registerTrigger({
   type: 'http',
-  function_id: 'orders.premium',
+  function_id: 'orders::premium',
   config: {
     api_path: 'orders/premium',
     http_method: 'POST',
-    _condition_path: 'conditions.is_premium',
+    _condition_path: 'conditions::is_premium',
   },
 })
 ```
@@ -76,16 +76,16 @@ async def orders_premium(data, ctx) -> ApiResponse:
     return ApiResponse(statusCode=200, body={"message": "Premium order processed"})
 
 
-iii.register_function("conditions.is_premium", is_premium)
-iii.register_function("orders.premium", lambda data: orders_premium(data, get_context()))
+iii.register_function("conditions::is_premium", is_premium)
+iii.register_function("orders::premium", lambda data: orders_premium(data, get_context()))
 
 iii.register_trigger(
     type="http",
-    function_id="orders.premium",
+    function_id="orders::premium",
     config={
         "api_path": "orders/premium",
         "http_method": "POST",
-        "_condition_path": "conditions.is_premium",
+        "_condition_path": "conditions::is_premium",
     },
 )
 ```
@@ -102,22 +102,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let iii = III::new("ws://127.0.0.1:49134");
     iii.connect().await?;
 
-    iii.register_function("conditions.is_premium", |input| async move {
+    iii.register_function("conditions::is_premium", |input| async move {
         let amount = input["body"]["amount"].as_f64().unwrap_or(0.0);
         Ok(json!(amount > 1000.0))
     });
 
-    iii.register_function("orders.premium", |input| async move {
+    iii.register_function("orders::premium", |input| async move {
         let ctx = get_context();
         let amount = input["body"]["amount"].as_f64().unwrap_or(0.0);
         ctx.logger.info("Processing premium order", Some(json!({ "amount": amount })));
         Ok(json!({ "status_code": 200, "body": { "message": "Premium order processed" } }))
     });
 
-    iii.register_trigger("http", "orders.premium", json!({
+    iii.register_trigger("http", "orders::premium", json!({
         "api_path": "orders/premium",
         "http_method": "POST",
-        "_condition_path": "conditions.is_premium",
+        "_condition_path": "conditions::is_premium",
     }))?;
 
     loop { tokio::time::sleep(std::time::Duration::from_secs(60)).await; }
@@ -136,14 +136,14 @@ The condition function receives the queue message data. If it returns `false`, t
 
 ```typescript
 iii.registerFunction(
-  { id: 'conditions.is_high_value' },
+  { id: 'conditions::is_high_value' },
   async (data: { amount: number }) => {
     return data.amount > 1000
   },
 )
 
 iii.registerFunction(
-  { id: 'orders.high_value', description: 'Processes high-value orders from queue' },
+  { id: 'orders::high_value', description: 'Processes high-value orders from queue' },
   async (data: { amount: number; description: string }) => {
     const ctx = getContext()
     ctx.logger.info('Processing high-value order', { amount: data.amount })
@@ -157,8 +157,8 @@ iii.registerFunction(
 
 iii.registerTrigger({
   type: 'queue',
-  function_id: 'orders.high_value',
-  config: { topic: 'order.created', _condition_path: 'conditions.is_high_value' },
+  function_id: 'orders::high_value',
+  config: { topic: 'order.created', _condition_path: 'conditions::is_high_value' },
 })
 ```
 
@@ -184,13 +184,13 @@ async def orders_high_value(data: dict, ctx) -> None:
     })
 
 
-iii.register_function("conditions.is_high_value", is_high_value)
-iii.register_function("orders.high_value", lambda data: orders_high_value(data, get_context()))
+iii.register_function("conditions::is_high_value", is_high_value)
+iii.register_function("orders::high_value", lambda data: orders_high_value(data, get_context()))
 
 iii.register_trigger(
     type="queue",
-    function_id="orders.high_value",
-    config={"topic": "order.created", "_condition_path": "conditions.is_high_value"},
+    function_id="orders::high_value",
+    config={"topic": "order.created", "_condition_path": "conditions::is_high_value"},
 )
 ```
 
@@ -198,12 +198,12 @@ iii.register_trigger(
   <Tab value="Rust">
 
 ```rust
-iii.register_function("conditions.is_high_value", |input| async move {
+iii.register_function("conditions::is_high_value", |input| async move {
     let amount = input["amount"].as_f64().unwrap_or(0.0);
     Ok(json!(amount > 1000.0))
 });
 
-iii.register_function("orders.high_value", |input| async move {
+iii.register_function("orders::high_value", |input| async move {
     let ctx = get_context();
     let amount = input["amount"].as_f64().unwrap_or(0.0);
     ctx.logger.info("Processing high-value order", Some(json!({ "amount": amount })));
@@ -216,9 +216,9 @@ iii.register_function("orders.high_value", |input| async move {
     Ok(json!(null))
 });
 
-iii.register_trigger("queue", "orders.high_value", json!({
+iii.register_trigger("queue", "orders::high_value", json!({
     "topic": "order.created",
-    "_condition_path": "conditions.is_high_value",
+    "_condition_path": "conditions::is_high_value",
 }))?;
 ```
 
@@ -234,14 +234,14 @@ State and stream triggers use `condition_function_id` in the config instead of `
 
 ```typescript
 iii.registerFunction(
-  { id: 'conditions.is_update' },
+  { id: 'conditions::is_update' },
   async (event: { event_type: string; scope: string; key: string; old_value: unknown; new_value: unknown }) => {
     return event.event_type === 'updated'
   },
 )
 
 iii.registerFunction(
-  { id: 'orders.on_update', description: 'Reacts to order state updates' },
+  { id: 'orders::on_update', description: 'Reacts to order state updates' },
   async (event) => {
     const ctx = getContext()
     ctx.logger.info('Order updated', { scope: event.scope, key: event.key })
@@ -250,8 +250,8 @@ iii.registerFunction(
 
 iii.registerTrigger({
   type: 'state',
-  function_id: 'orders.on_update',
-  config: { scope: 'orders', condition_function_id: 'conditions.is_update' },
+  function_id: 'orders::on_update',
+  config: { scope: 'orders', condition_function_id: 'conditions::is_update' },
 })
 ```
 
@@ -269,13 +269,13 @@ async def orders_on_update(event: dict, ctx) -> None:
     ctx.logger.info("Order updated", {"scope": event.get("scope"), "key": event.get("key")})
 
 
-iii.register_function("conditions.is_update", is_update)
-iii.register_function("orders.on_update", lambda data: orders_on_update(data, get_context()))
+iii.register_function("conditions::is_update", is_update)
+iii.register_function("orders::on_update", lambda data: orders_on_update(data, get_context()))
 
 iii.register_trigger(
     type="state",
-    function_id="orders.on_update",
-    config={"scope": "orders", "condition_function_id": "conditions.is_update"},
+    function_id="orders::on_update",
+    config={"scope": "orders", "condition_function_id": "conditions::is_update"},
 )
 ```
 
@@ -283,12 +283,12 @@ iii.register_trigger(
   <Tab value="Rust">
 
 ```rust
-iii.register_function("conditions.is_update", |input| async move {
+iii.register_function("conditions::is_update", |input| async move {
     let event_type = input["event_type"].as_str().unwrap_or("");
     Ok(json!(event_type == "updated"))
 });
 
-iii.register_function("orders.on_update", |input| async move {
+iii.register_function("orders::on_update", |input| async move {
     let ctx = get_context();
     ctx.logger.info("Order updated", Some(json!({
         "scope": input["scope"],
@@ -297,9 +297,9 @@ iii.register_function("orders.on_update", |input| async move {
     Ok(json!(null))
 });
 
-iii.register_trigger("state", "orders.on_update", json!({
+iii.register_trigger("state", "orders::on_update", json!({
     "scope": "orders",
-    "condition_function_id": "conditions.is_update",
+    "condition_function_id": "conditions::is_update",
 }))?;
 ```
 
