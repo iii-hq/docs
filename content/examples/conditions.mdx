@@ -1,16 +1,16 @@
 ---
 title: 'Conditions'
-description: 'Pre-handler functions the engine evaluates before executing a trigger — if the condition returns false, the handler is skipped.'
+description: 'Pre-handler functions the engine evaluates before executing a trigger — if the condition returns false, the handler function is not called.'
 hideCards: true
 ---
 
-Conditions are regular iii functions that the engine calls **before** a trigger's handler runs. Attach a condition to any trigger by adding the condition function's ID to the trigger config. If the condition returns `false`, the handler is skipped entirely.
+Conditions are regular iii functions that the engine calls **before** a trigger's handler runs. Attach a condition to any trigger by adding the condition function's ID to the trigger config. If the condition returns `false`, the handler function is not called.
 
 ```mermaid
 graph LR
     Trigger -->|event data| Condition{{"condition fn"}}
     Condition -->|"true"| Handler[handler fn]
-    Condition -->|"false"| Skip[skip handler]
+    Condition -->|"false"| Skip[handler not called]
 ```
 
 <Callout type="info">
@@ -19,7 +19,7 @@ graph LR
 
 ## HTTP trigger condition
 
-The condition function receives the full API request. If it returns `false`, the engine responds with `422 Unprocessable Entity` and the handler never runs.
+The condition function receives the full API request. If it returns `false`, the engine responds with `422 Unprocessable Entity` and the handler function is not called.
 
 <Tabs items={['TypeScript', 'Python', 'Rust']}>
   <Tab value="TypeScript">
@@ -129,7 +129,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ## Queue trigger condition
 
-The condition function receives the queue message data. If it returns `false`, the message is silently skipped — no error is raised.
+The condition function receives the queue message data. If it returns `false`, the handler function is not called — no error is raised.
 
 <Tabs items={['TypeScript', 'Python', 'Rust']}>
   <Tab value="TypeScript">
@@ -312,8 +312,8 @@ iii.register_trigger("state", "orders.on_update", json!({
 - For HTTP, queue, and cron triggers, add `_condition_path` to the trigger config with the condition function's ID.
 - For state and stream triggers, use `condition_function_id` in the trigger config instead.
 - When a condition returns `false`:
-  - **HTTP** — the engine responds with `422 Unprocessable Entity`; the handler never runs.
-  - **Queue / Cron** — the event is silently skipped; no error is surfaced.
-  - **State / Stream** — the event is silently skipped.
-- If a condition function errors, the engine logs the error and skips the handler (HTTP returns `500 Internal Server Error`).
+  - **HTTP** — the engine responds with `422 Unprocessable Entity`; the handler function is not called.
+  - **Queue / Cron** — the handler function is not called; no error is surfaced.
+  - **State / Stream** — the handler function is not called.
+- If a condition function errors, the engine logs the error and does not call the handler (HTTP returns `500 Internal Server Error`).
 - A single condition function can be shared across multiple triggers.
