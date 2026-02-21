@@ -30,7 +30,7 @@ const iii = init(process.env.III_BRIDGE_URL ?? 'ws://localhost:49134', {
         Display name for this worker. Defaults to `hostname:pid`.
       </ResponseField>
       <ResponseField name="invocationTimeoutMs" type="number">
-        Default timeout for `call()` in milliseconds. Defaults to `30000`.
+        Default timeout for `trigger()` in milliseconds. Defaults to `30000`.
       </ResponseField>
       <ResponseField name="enableMetricsReporting" type="boolean">
         Enable worker metrics via OpenTelemetry. Defaults to `true`.
@@ -151,30 +151,9 @@ const iii = init(process.env.III_BRIDGE_URL ?? 'ws://localhost:49134', {
   </AccordionGroup>
 </ResponseField>
 
-### registerService
+### trigger
 
-<ResponseField name="registerService" type="(service: RegisterServiceInput) => void" required>
-  Registers a service. A service groups related functions under a common namespace.
-
-  <AccordionGroup>
-    <Accordion iconName="Settings" title="Parameters" description="">
-      <ResponseField name="service" type="RegisterServiceInput" required>
-        <Expandable title="RegisterServiceInput">
-          <ResponseField name="id" type="string" required>
-            Unique service identifier.
-          </ResponseField>
-          <ResponseField name="description" type="string">
-            Human-readable description.
-          </ResponseField>
-        </Expandable>
-      </ResponseField>
-    </Accordion>
-  </AccordionGroup>
-</ResponseField>
-
-### call
-
-<ResponseField name="call" type="&lt;TInput, TOutput&gt;(function_id: string, data: TInput, timeoutMs?: number) => Promise&lt;TOutput&gt;" required>
+<ResponseField name="trigger" type="&lt;TInput, TOutput&gt;(function_id: string, data: TInput, timeoutMs?: number) => Promise&lt;TOutput&gt;" required>
   Invokes a remote function and waits for the result.
 
   <AccordionGroup>
@@ -197,9 +176,9 @@ const iii = init(process.env.III_BRIDGE_URL ?? 'ws://localhost:49134', {
   </AccordionGroup>
 </ResponseField>
 
-### callVoid
+### triggerVoid
 
-<ResponseField name="callVoid" type="&lt;TInput&gt;(function_id: string, data: TInput) => void" required>
+<ResponseField name="triggerVoid" type="&lt;TInput&gt;(function_id: string, data: TInput) => void" required>
   Fire-and-forget invocation. No response is expected.
 
   <AccordionGroup>
@@ -213,6 +192,10 @@ const iii = init(process.env.III_BRIDGE_URL ?? 'ws://localhost:49134', {
     </Accordion>
   </AccordionGroup>
 </ResponseField>
+
+<Callout type="warn" title="Deprecated methods">
+  `call` and `callVoid` are deprecated. Use `trigger` and `triggerVoid` instead.
+</Callout>
 
 ### createStream
 

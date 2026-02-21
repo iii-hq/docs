@@ -132,15 +132,9 @@ asyncio.run(main())
   </AccordionGroup>
 </ResponseField>
 
-### register_service
+### trigger
 
-<ResponseField name="register_service" type="(id: str, description: str | None = None, parent_id: str | None = None) => None" required>
-  Registers a service namespace that groups related functions.
-</ResponseField>
-
-### call
-
-<ResponseField name="call" type="async (path: str, data: Any, timeout: float = 30.0) => Any" required>
+<ResponseField name="trigger" type="async (path: str, data: Any, timeout: float = 30.0) => Any" required>
   Invokes a remote function and waits for the result.
 
   <AccordionGroup>
@@ -157,7 +151,7 @@ asyncio.run(main())
     </Accordion>
     <Accordion iconName="Code" title="Example" description="">
       ```python
-      result = await iii.call("queue::enqueue", {
+      result = await iii.trigger("queue::enqueue", {
           "topic": "user.created",
           "data": {"user_id": "123"},
       })
@@ -166,11 +160,15 @@ asyncio.run(main())
   </AccordionGroup>
 </ResponseField>
 
-### call_void
+### trigger_void
 
-<ResponseField name="call_void" type="(path: str, data: Any) => None" required>
+<ResponseField name="trigger_void" type="(path: str, data: Any) => None" required>
   Fire-and-forget invocation. No response is expected.
 </ResponseField>
+
+<Callout type="warn" title="Deprecated methods">
+  `call` and `call_void` are deprecated. Use `trigger` and `trigger_void` instead.
+</Callout>
 
 ### create_stream
 

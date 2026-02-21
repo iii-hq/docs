@@ -101,27 +101,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
   </AccordionGroup>
 </ResponseField>
 
-### register_service
+### trigger
 
-<ResponseField name="register_service" type="fn(&self, id: impl Into&lt;String&gt;, description: Option&lt;String&gt;)" required>
-  Registers a service namespace.
-</ResponseField>
-
-### register_service_with_name
-
-<ResponseField name="register_service_with_name" type="fn(&self, id: impl Into&lt;String&gt;, name: impl Into&lt;String&gt;, description: Option&lt;String&gt;)" required>
-  Registers a service with a separate display name.
-</ResponseField>
-
-### call
-
-<ResponseField name="call" type="async fn(&self, function_id: &str, data: impl Serialize) => Result&lt;Value, IIIError&gt;" required>
+<ResponseField name="trigger" type="async fn(&self, function_id: &str, data: impl Serialize) => Result&lt;Value, IIIError&gt;" required>
   Invokes a remote function with a 30-second default timeout.
 
   <AccordionGroup>
     <Accordion iconName="Code" title="Example" description="">
       ```rust
-      let result = iii.call("queue::enqueue", json!({
+      let result = iii.trigger("queue::enqueue", json!({
           "topic": "user.created",
           "data": {"user_id": "123"},
       })).await?;
@@ -130,17 +118,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
   </AccordionGroup>
 </ResponseField>
 
-### call_with_timeout
+### trigger_with_timeout
 
-<ResponseField name="call_with_timeout" type="async fn(&self, function_id: &str, data: Value, timeout: Duration) => Result&lt;Value, IIIError&gt;" required>
+<ResponseField name="trigger_with_timeout" type="async fn(&self, function_id: &str, data: Value, timeout: Duration) => Result&lt;Value, IIIError&gt;" required>
   Invokes a remote function with a custom timeout.
 </ResponseField>
 
-### call_void
+### trigger_void
 
-<ResponseField name="call_void" type="fn(&self, function_id: &str, data: impl Serialize) => Result&lt;(), IIIError&gt;" required>
+<ResponseField name="trigger_void" type="fn(&self, function_id: &str, data: impl Serialize) => Result&lt;(), IIIError&gt;" required>
   Fire-and-forget invocation. Sends the message without waiting for a response.
 </ResponseField>
+
+<Callout type="warn" title="Deprecated methods">
+  `call`, `call_with_timeout`, and `call_void` are deprecated. Use `trigger`, `trigger_with_timeout`, and `trigger_void` instead.
+</Callout>
 
 ### shutdown_async
 
@@ -251,7 +243,7 @@ use iii_sdk::types::{
 };
 
 use iii_sdk::protocol::{
-    Message, RegisterFunctionMessage, RegisterServiceMessage,
+    Message, RegisterFunctionMessage,
     RegisterTriggerMessage, RegisterTriggerTypeMessage, ErrorBody,
 };
 ```

@@ -50,18 +50,12 @@ await bridge.connect()
 
 ### 2. Registration
 
-Worker registers services, functions, and triggers:
+Worker registers functions and triggers:
 
 ```typescript
-// Register a service (logical grouping)
-bridge.registerService({
-  id: 'users',
-  name: 'User Management',
-})
-
 // Register a function
 bridge.registerFunction({
-  function_path: 'users.create',
+  id: 'users::create',
   handler: async (data) => {
     // Business logic here
     return { id: '123', ...data }
@@ -70,8 +64,8 @@ bridge.registerFunction({
 
 // Register a trigger
 bridge.registerTrigger({
-  trigger_type: 'api',
-  function_path: 'users.create',
+  type: 'http',
+  function_id: 'users::create',
   config: {
     api_path: '/users',
     http_method: 'POST',
@@ -258,20 +252,16 @@ bridge.connect()
 
   </Accordion>
 
-  <Accordion title="Service Organization">
-    Group related functions under services for better organization:
+  <Accordion title="Function Organization">
+    Group related functions using namespaced IDs:
 
     ```typescript
-    // User service
-    bridge.registerService({ id: 'users' });
-    bridge.registerFunction({ function_path: 'users.create', ... });
-    bridge.registerFunction({ function_path: 'users.update', ... });
-    bridge.registerFunction({ function_path: 'users.delete', ... });
+    bridge.registerFunction({ id: 'users::create', ... });
+    bridge.registerFunction({ id: 'users::update', ... });
+    bridge.registerFunction({ id: 'users::delete', ... });
 
-    // Auth service
-    bridge.registerService({ id: 'auth' });
-    bridge.registerFunction({ function_path: 'auth.login', ... });
-    bridge.registerFunction({ function_path: 'auth.logout', ... });
+    bridge.registerFunction({ id: 'auth::login', ... });
+    bridge.registerFunction({ id: 'auth::logout', ... });
     ```
 
   </Accordion>

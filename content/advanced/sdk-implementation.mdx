@@ -34,7 +34,6 @@ sequenceDiagram
 
     Note over SDK, Engine: On Open - Register All
     SDK->>Engine: RegisterTriggerType
-    SDK->>Engine: RegisterService
     SDK->>Engine: RegisterFunction
     SDK->>Engine: RegisterTrigger
 
@@ -63,7 +62,6 @@ The SDKs communicate with the engine using JSON messages over WebSocket. Each me
 | `registertrigger` | Binds a trigger config to a function | `trigger_type`, `function_id`, `config` |
 | `invokefunction` | Requests function execution | `function_id`, `data`, `invocation_id` |
 | `invocationresult` | Returns execution result | `invocation_id`, `result`, `error` |
-| `registerservice` | Registers a service namespace | `id`, `description` |
 | `registertriggertype` | Registers a custom trigger type | `id`, `description` |
 | `workerregistered` | Engine confirms worker registration | `worker_id` |
 
@@ -87,7 +85,7 @@ import { init, getContext, type ApiRequest, type ApiResponse } from 'iii-sdk'
 const iii = init('ws://127.0.0.1:49134')
 
 iii.registerFunction(
-  { id: 'users.create', description: 'Create a user' },
+  { id: 'users::create', description: 'Create a user' },
   async (data) => {
     const ctx = getContext()
     ctx.logger.info('Creating user', data)
@@ -98,7 +96,7 @@ iii.registerFunction(
 
 iii.registerTrigger({
   type: 'http',
-  function_id: 'users.create',
+  function_id: 'users::create',
   config: { api_path: '/users', http_method: 'POST' },
 })
 ```
@@ -153,11 +151,11 @@ async def create_user(data):
     user = {"id": "123", **data}
     return {"status_code": 201, "body": user}
 
-iii.register_function("users.create", create_user, description="Create a user")
+iii.register_function("users::create", create_user, description="Create a user")
 
 iii.register_trigger(
     type="http",
-    function_id="users.create",
+    function_id="users::create",
     config={"api_path": "/users", "http_method": "POST"},
 )
 
@@ -256,7 +254,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let iii = III::new("ws://127.0.0.1:49134");
     iii.connect().await?;
 
-    iii.register_function("users.create", |input| async move {
+    iii.register_function("users::create", |input| async move {
         let ctx = get_context();
         ctx.logger.info("Creating user", None);
         Ok(json!({
@@ -265,7 +263,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }))
     });
 
-    iii.register_trigger("http", "users.create", json!({
+    iii.register_trigger("http", "users::create", json!({
         "api_path": "/users",
         "http_method": "POST",
     }))?;

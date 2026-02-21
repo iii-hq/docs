@@ -26,8 +26,8 @@ The iii SDK connects your application to the iii Engine via WebSocket. It provid
 | Register function | `iii.registerFunction({ id }, handler)` | `iii.register_function(path, handler)` | `iii.register_function(id, \|input\| ...)` |
 | Register trigger | `iii.registerTrigger({ type, function_id, config })` | `iii.register_trigger(type, function_id, config)` | `iii.register_trigger(type, function_id, config)?` |
 | Context | `getContext()` | `get_context()` | `get_context()` |
-| Call (sync) | `await iii.call(id, data)` | `await iii.call(path, data)` | `iii.call(id, data).await?` |
-| Call (fire-and-forget) | `iii.callVoid(id, data)` | `iii.call_void(path, data)` | `iii.call_void(id, data)?` |
+| Trigger (sync) | `await iii.trigger(id, data)` | `await iii.trigger(path, data)` | `iii.trigger(id, data).await?` |
+| Trigger (fire-and-forget) | `iii.triggerVoid(id, data)` | `iii.trigger_void(path, data)` | `iii.trigger_void(id, data)?` |
 | Shutdown | `await iii.shutdown()` | `await iii.shutdown()` | `iii.shutdown_async().await` |
 
 <Tip>

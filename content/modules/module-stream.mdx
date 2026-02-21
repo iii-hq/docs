@@ -258,25 +258,25 @@ iii.registerTrigger({
 Streams organize data by `stream_name`, `group_id`, and `item_id`. Use for live presence, collaborative docs, or dashboards:
 
 ```typescript
-await iii.call('stream::set', {
+await iii.trigger('stream::set', {
   stream_name: 'presence',
   group_id: 'room-1',
   item_id: 'user-123',
   data: { name: 'Alice', online: true, lastSeen: new Date().toISOString() },
 })
 
-const user = await iii.call('stream::get', {
+const user = await iii.trigger('stream::get', {
   stream_name: 'presence',
   group_id: 'room-1',
   item_id: 'user-123',
 })
 
-const roomMembers = await iii.call('stream::list', {
+const roomMembers = await iii.trigger('stream::list', {
   stream_name: 'presence',
   group_id: 'room-1',
 })
 
-await iii.call('stream::delete', {
+await iii.trigger('stream::delete', {
   stream_name: 'presence',
   group_id: 'room-1',
   item_id: 'user-123',
