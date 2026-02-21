@@ -235,7 +235,7 @@ Join and leave triggers receive the same payload shape when invoked.
 </ResponseField>
 
 <ResponseField name="condition_function_id" type="string">
-  Function ID for conditional execution (stream:join, stream:leave). The engine invokes it with the subscription payload; if it returns `false`, the handler is skipped.
+  Function ID for conditional execution (stream:join, stream:leave). The engine invokes it with the subscription payload; if it returns `false`, the handler function is not called.
 </ResponseField>
 
 ### Sample Code
@@ -335,7 +335,7 @@ iii.registerTrigger({
 
 ```typescript
 const conditionFn = iii.registerFunction(
-  { id: 'conditions.requireContext' },
+  { id: 'conditions::requireContext' },
   async (input) => input.context?.userId != null,
 )
 

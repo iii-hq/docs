@@ -60,7 +60,7 @@ Executes functions in response to HTTP requests.
 
 **Output**: `ApiResponse` with status_code, body, headers
 
-**Conditions**: Optional. Add `_condition_path` to config with a function ID. The engine invokes it before the handler; if it returns `false`, the handler is skipped. See [Trigger Conditions](#trigger-conditions).
+**Conditions**: Optional. Add `_condition_path` to config with a function ID. The engine invokes it before the handler; if it returns `false`, the handler function is not called. See [Trigger Conditions](#trigger-conditions).
 
 **Path Parameters**: Extract values from URL
 
@@ -130,7 +130,7 @@ Executes functions on a time-based schedule using cron expressions.
 
 **Output**: Function result
 
-**Conditions**: Optional. Add `condition_function_id` to config. See [Trigger Conditions](#trigger-conditions).
+**Conditions**: Optional. Add `_condition_path` to config. See [Trigger Conditions](#trigger-conditions).
 
 **Cron Expression**: Standard 5-field format (minute hour day month weekday)
 
@@ -315,18 +315,18 @@ Triggers can optionally use a **condition function** to decide whether the handl
 ### How It Works
 
 1. Register a condition function that receives the same input as the handler and returns a boolean.
-2. Add `condition_function_id` to the trigger config (or `_condition_path` for http/queue triggers).
+2. Add `_condition_path` to the trigger config for http, queue, and cron; use `condition_function_id` for state and stream triggers.
 3. When the trigger fires, the engine calls the condition first. Only if it returns truthy does the handler run.
 
 ### Example: HTTP Trigger with Condition
 
 ```typescript
 const conditionFn = iii.registerFunction(
-  { id: 'conditions.requireVerified' },
+  { id: 'conditions::requireVerified' },
   async (req) => req.headers?.['x-verified'] === 'true',
 )
 
-const fn = iii.registerFunction({ id: 'api.verifiedOnly' }, async (req) => ({
+const fn = iii.registerFunction({ id: 'api::verifiedOnly' }, async (req) => ({
   status_code: 200,
   body: { message: 'Verified request' },
 }))
@@ -346,11 +346,11 @@ iii.registerTrigger({
 
 ```typescript
 const conditionFn = iii.registerFunction(
-  { id: 'conditions.highValue' },
+  { id: 'conditions::highValue' },
   async (data) => (data?.amount ?? 0) > 1000,
 )
 
-const fn = iii.registerFunction({ id: 'orders.processHighValue' }, async (order) => {
+const fn = iii.registerFunction({ id: 'orders::processHighValue' }, async (order) => {
   await processHighValueOrder(order)
   return {}
 })
@@ -369,11 +369,11 @@ iii.registerTrigger({
 
 ```typescript
 const conditionFn = iii.registerFunction(
-  { id: 'conditions.profileChanged' },
+  { id: 'conditions::profileChanged' },
   async (event) => event.event_type === 'state:updated' && event.key === 'profile',
 )
 
-const fn = iii.registerFunction({ id: 'state.onProfileUpdate' }, async (event) => {
+const fn = iii.registerFunction({ id: 'state::onProfileUpdate' }, async (event) => {
   console.log('Profile updated:', event.new_value)
   return {}
 })
@@ -394,7 +394,7 @@ iii.registerTrigger({
 |--------------|----------------------|
 | http | `_condition_path` |
 | queue | `_condition_path` |
-| cron | `condition_function_id` |
+| cron | `_condition_path` |
 | stream, stream:join, stream:leave | `condition_function_id` |
 | state | `condition_function_id` |
 
