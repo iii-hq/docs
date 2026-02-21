@@ -142,18 +142,18 @@ modules::kv_server::KvServer
 ### Basic Key-Value Operations
 
 ```typescript
-await iii.call('kv_server::set', {
+await iii.trigger('kv_server::set', {
   index: 'default',
   key: 'user:123',
   value: { name: 'John', email: 'john@example.com' },
 })
 
-const user = await iii.call('kv_server::get', {
+const user = await iii.trigger('kv_server::get', {
   index: 'default',
   key: 'user:123',
 })
 
-await iii.call('kv_server::delete', {
+await iii.trigger('kv_server::delete', {
   index: 'default',
   key: 'user:123',
 })
@@ -162,11 +162,11 @@ await iii.call('kv_server::delete', {
 ### Listing Keys with Prefix
 
 ```typescript
-await iii.call('kv_server::set', { index: 'default', key: 'user:1', value: { name: 'Alice' } })
-await iii.call('kv_server::set', { index: 'default', key: 'user:2', value: { name: 'Bob' } })
-await iii.call('kv_server::set', { index: 'default', key: 'product:1', value: { name: 'Widget' } })
+await iii.trigger('kv_server::set', { index: 'default', key: 'user:1', value: { name: 'Alice' } })
+await iii.trigger('kv_server::set', { index: 'default', key: 'user:2', value: { name: 'Bob' } })
+await iii.trigger('kv_server::set', { index: 'default', key: 'product:1', value: { name: 'Widget' } })
 
-const userKeys = await iii.call('kv_server::list_keys_with_prefix', {
+const userKeys = await iii.trigger('kv_server::list_keys_with_prefix', {
   prefix: 'user:',
 })
 ```
