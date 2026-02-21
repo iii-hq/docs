@@ -58,7 +58,7 @@ modules:
       host: 0.0.0.0
       port: 3112
       adapter:
-        class: modules::streams::adapters::RedisAdapter
+        class: modules::stream::adapters::RedisAdapter
         config:
           redis_url: redis://localhost:6379
 ```
@@ -156,7 +156,7 @@ your-domain.com {
     handle /api/* {
         reverse_proxy 127.0.0.1:3111
     }
-    handle /streams/* {
+    handle /stream/* {
         reverse_proxy 127.0.0.1:3112
     }
     handle /ws {

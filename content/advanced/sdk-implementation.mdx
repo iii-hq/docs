@@ -252,7 +252,6 @@ use serde_json::json;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let iii = III::new("ws://127.0.0.1:49134");
-    iii.connect().await?;
 
     iii.register_function("users::create", |input| async move {
         let ctx = get_context();
@@ -267,6 +266,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "api_path": "/users",
         "http_method": "POST",
     }))?;
+
+    iii.connect().await?;
 
     loop {
         tokio::time::sleep(std::time::Duration::from_secs(60)).await;

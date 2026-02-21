@@ -162,7 +162,7 @@ Create the actual adapter implementations.
     use tokio::sync::RwLock;
 
     pub struct InMemoryEventAdapter {
-        subscriptions: Arc<RwLock<HashMap<String, Vec<String>>>>,
+        subscriptions: Arc<RwLock<HashMap<String, HashMap<String, String>>>>,
         engine: Arc<Engine>,
     }
 
@@ -182,24 +182,24 @@ Create the actual adapter implementations.
     impl CustomEventAdapter for InMemoryEventAdapter {
         async fn emit(&self, topic: &str, event_data: Value) {
             let subs = self.subscriptions.read().await;
-            if let Some(function_ids) = subs.get(topic) {
-                for function_id in function_ids {
+            if let Some(by_id) = subs.get(topic) {
+                for function_id in by_id.values() {
                     let _ = self.engine.call(function_id, event_data.clone()).await;
                 }
             }
         }
 
-        async fn subscribe(&self, topic: &str, _id: &str, function_id: &str) {
+        async fn subscribe(&self, topic: &str, id: &str, function_id: &str) {
             let mut subs = self.subscriptions.write().await;
             subs.entry(topic.to_string())
-                .or_insert_with(Vec::new)
-                .push(function_id.to_string());
+                .or_insert_with(HashMap::new)
+                .insert(id.to_string(), function_id.to_string());
         }
 
         async fn unsubscribe(&self, topic: &str, id: &str) {
             let mut subs = self.subscriptions.write().await;
-            if let Some(ids) = subs.get_mut(topic) {
-                ids.retain(|fid| fid != id);
+            if let Some(by_id) = subs.get_mut(topic) {
+                by_id.remove(id);
             }
         }
     }
@@ -513,7 +513,7 @@ pub trait CustomEventAdapter: Send + Sync + 'static {
 
 // 2. Implement In-Memory Adapter
 pub struct InMemoryEventAdapter {
-    subscriptions: Arc<RwLock<HashMap<String, Vec<String>>>>,
+    subscriptions: Arc<RwLock<HashMap<String, HashMap<String, String>>>>,
     engine: Arc<Engine>,
 }
 
@@ -530,24 +530,24 @@ impl InMemoryEventAdapter {
 impl CustomEventAdapter for InMemoryEventAdapter {
     async fn emit(&self, topic: &str, event_data: Value) {
         let subs = self.subscriptions.read().await;
-        if let Some(function_ids) = subs.get(topic) {
-            for function_id in function_ids {
+        if let Some(by_id) = subs.get(topic) {
+            for function_id in by_id.values() {
                 let _ = self.engine.call(function_id, event_data.clone()).await;
             }
         }
     }
 
-    async fn subscribe(&self, topic: &str, _id: &str, function_id: &str) {
+    async fn subscribe(&self, topic: &str, id: &str, function_id: &str) {
         let mut subs = self.subscriptions.write().await;
         subs.entry(topic.to_string())
-            .or_insert_with(Vec::new)
-            .push(function_id.to_string());
+            .or_insert_with(HashMap::new)
+            .insert(id.to_string(), function_id.to_string());
     }
 
     async fn unsubscribe(&self, topic: &str, id: &str) {
         let mut subs = self.subscriptions.write().await;
-        if let Some(ids) = subs.get_mut(topic) {
-            ids.retain(|fid| fid != id);
+        if let Some(by_id) = subs.get_mut(topic) {
+            by_id.remove(id);
         }
     }
 }
@@ -706,7 +706,7 @@ modules:
     ```rust
     tracing::info!(
         topic = %topic,
-        subscriber_count = subs.len(),
+        subscriber_count = by_id.len(),
         "Emitting event to subscribers"
     );
     ```

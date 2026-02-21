@@ -76,8 +76,11 @@ async def orders_premium(data, ctx) -> ApiResponse:
     return ApiResponse(statusCode=200, body={"message": "Premium order processed"})
 
 
+async def orders_premium_wrapper(data):
+    return await orders_premium(data, get_context())
+
 iii.register_function("conditions::is_premium", is_premium)
-iii.register_function("orders::premium", lambda data: orders_premium(data, get_context()))
+iii.register_function("orders::premium", orders_premium_wrapper)
 
 iii.register_trigger(
     type="http",

@@ -86,7 +86,7 @@ sequenceDiagram
     Note over W,E: Worker Connected & Registered
 
     C->>E: HTTP POST /users
-    E->>W: invokefunction { function_path: "users.create" }
+    E->>W: invokefunction { function_id: "users::create" }
     W->>W: Execute handler
     W-->>E: invocationresult { result: {...} }
     E-->>C: HTTP 200 OK
@@ -100,7 +100,7 @@ The Engine maintains a registry of connected workers:
 | ---------------- | ---------------------------------------------------- |
 | `WorkerRegistry` | Thread-safe map storing active workers by UUID       |
 | `Worker`         | Represents a connected client with WebSocket channel |
-| `function_paths` | Set of functions the worker can execute              |
+| `function_ids` | Set of functions the worker can execute              |
 | `invocations`    | Active request IDs being processed                   |
 
 ### Worker State
@@ -108,7 +108,7 @@ The Engine maintains a registry of connected workers:
 Each worker tracks:
 
 - **UUID**: Unique identifier assigned on connection
-- **Function Paths**: List of registered functions (e.g., `users.create`, `api.echo`)
+- **Function IDs**: List of registered functions (e.g., `users::create`, `api::echo`)
 - **Active Invocations**: Currently executing requests
 - **WebSocket Channel**: Communication channel to the Engine
 
@@ -150,7 +150,7 @@ const bridge = createBridge()
 
 // Register functions
 bridge.registerFunction({
-  function_path: 'greet.hello',
+  id: 'greet.hello',
   handler: async ({ name }) => {
     return { message: `Hello, ${name}!` }
   },
@@ -158,8 +158,8 @@ bridge.registerFunction({
 
 // Register API trigger
 bridge.registerTrigger({
-  trigger_type: 'api',
-  function_path: 'greet.hello',
+  type: 'api',
+  function_id: 'greet.hello',
   config: {
     api_path: '/greet/:name',
     http_method: 'GET',
@@ -186,8 +186,8 @@ async def hello(data):
 
 # Register API trigger
 bridge.register_trigger(
-    trigger_type='api',
-    function_path='greet.hello',
+    type='api',
+    function_id='greet.hello',
     config={
         'api_path': '/greet/:name',
         'http_method': 'GET'
@@ -217,7 +217,7 @@ bridge.connect()
 
     ```typescript
     bridge.registerFunction({
-      function_path: 'users.create',
+      id: 'users::create',
       handler: async (data) => {
         try {
           const user = await createUser(data);

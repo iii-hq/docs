@@ -154,7 +154,7 @@ const iii = init(process.env.III_BRIDGE_URL ?? 'ws://localhost:49134', {
 ### trigger
 
 <ResponseField name="trigger" type="&lt;TInput, TOutput&gt;(function_id: string, data: TInput, timeoutMs?: number) => Promise&lt;TOutput&gt;" required>
-  Invokes a remote function and waits for the result.
+  Invokes a remote function and waits for the result. This method is asynchronous and returns a Promise resolving to the function result.
 
   <AccordionGroup>
     <Accordion iconName="Settings" title="Parameters" description="">

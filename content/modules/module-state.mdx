@@ -247,7 +247,7 @@ When the trigger fires, the handler receives a state event object:
 
 ```typescript
 const fn = iii.registerFunction(
-  { id: 'state.onUserUpdated' },
+  { id: 'state::onUserUpdated' },
   async (event) => {
     console.log('State changed:', event.event_type, event.key)
     console.log('Previous:', event.old_value)

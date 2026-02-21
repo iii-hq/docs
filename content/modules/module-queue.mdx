@@ -76,7 +76,7 @@ iii.registerTrigger({
   config: { topic: 'user.created' },
 })
 
-await iii.trigger('enqueue', {
+await iii.trigger('queue::enqueue', {
   topic: 'user.created',
   data: { id: '123', email: 'user@example.com' },
 })

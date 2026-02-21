@@ -81,6 +81,8 @@ iii.register_trigger(
 use iii_sdk::{III, get_context};
 use serde_json::json;
 
+let iii = III::new("ws://127.0.0.1:49134");
+
 iii.register_function("cron.periodic_job", |_input| async move {
     let ctx = get_context();
     ctx.logger.info("Periodic job fired", None);
@@ -99,6 +101,8 @@ iii.register_function("cron.periodic_job", |_input| async move {
 iii.register_trigger("cron", "cron.periodic_job", json!({
     "expression": "* * * * *",
 }))?;
+
+iii.connect().await?;
 ```
 
   </Tab>
