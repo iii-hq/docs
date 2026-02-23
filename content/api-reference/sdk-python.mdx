@@ -20,7 +20,24 @@ from iii import III, InitOptions, get_context, ApiRequest, ApiResponse
 The Python SDK requires an explicit `connect()` call to establish the WebSocket connection.
 
 ```python
-import asyncio
+  import asyncio
+  from iii import III
+
+  iii = III("ws://localhost:49134")
+
+  async def sum_function(data):
+      a = data.get("a", 0)
+      b = data.get("b", 0)
+      return {"sum": a + b}
+
+  iii.register_function("math.sum", sum_function, description="Add two numbers")
+
+  async def main():
+      await iii.connect()
+      result = await iii.call("math.sum", {"a": 2, "b": 3})
+      print(result)  # {"sum": 5}
+
+  asyncio.run(main())
 from iii import III, InitOptions
 
 iii = III(
