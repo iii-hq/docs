@@ -246,7 +246,7 @@ Registers a trigger that invokes a function when a specific event occurs (HTTP r
 <Tab value="TypeScript">
 ```typescript
 const trigger = iii.registerTrigger({
-  trigger_type: 'http',
+  type: 'http',
   function_id: 'users::create',
   config: { method: 'POST', path: '/users' },
 })
@@ -281,7 +281,7 @@ let trigger = iii.register_trigger(
         The trigger configuration.
 
         <Expandable title="RegisterTriggerInput">
-          <ResponseField name="trigger_type" type="string" required>
+          <ResponseField name="type" type="string" required>
             The trigger type (e.g., `'http'`, `'cron'`, `'queue'`).
           </ResponseField>
           <ResponseField name="function_id" type="string" required>

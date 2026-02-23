@@ -57,7 +57,7 @@ iii.registerFunction(
 )
 
 iii.registerTrigger({
-  trigger_type: 'http',
+  type: 'http',
   function_id: 'users::create',
   config: {
     api_path: '/users',
@@ -149,7 +149,7 @@ iii.registerFunction(
 )
 
 iii.registerTrigger({
-  trigger_type: 'http',
+  type: 'http',
   function_id: 'greet::hello',
   config: {
     api_path: '/greet/:name',
