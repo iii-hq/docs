@@ -118,7 +118,24 @@ modules::kv_server::KvServer
 </ResponseField>
 
 <ResponseField name="kv_server::list" type="function">
-  List all values that match a given key pattern.
+  List all values in an index.
+
+  <AccordionGroup>
+    <Accordion iconName="settings" title="Parameters">
+      <ResponseField name="index" type="string" required>
+        The index (namespace) to use for organizing data.
+      </ResponseField>
+    </Accordion>
+    <Accordion title="Returns">
+      <ResponseField name="values" type="any[]">
+        An array of all values in the index.
+      </ResponseField>
+    </Accordion>
+  </AccordionGroup>
+</ResponseField>
+
+<ResponseField name="kv_server::update" type="function">
+  Update a value by key in the KV store using patch operations.
 
   <AccordionGroup>
     <Accordion iconName="settings" title="Parameters">
@@ -126,12 +143,15 @@ modules::kv_server::KvServer
         The index (namespace) to use for organizing data.
       </ResponseField>
       <ResponseField name="key" type="string" required>
-        The key pattern to match.
+        The key of the value to update.
+      </ResponseField>
+      <ResponseField name="ops" type="any[]" required>
+        An array of patch operations to apply to the value.
       </ResponseField>
     </Accordion>
     <Accordion title="Returns">
-      <ResponseField name="values" type="any[]">
-        An array of values matching the key pattern.
+      <ResponseField name="result" type="object">
+        The result of the update operation containing the updated value.
       </ResponseField>
     </Accordion>
   </AccordionGroup>

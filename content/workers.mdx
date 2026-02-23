@@ -16,7 +16,7 @@ Workers are consumers of the iii architecture that:
 
 Workers can be written in any language with WebSocket support. Official SDKs are available for:
 
-- **Node.js/TypeScript**: `@iii-dev/sdk` (low-level) and `@iii-dev/motia` (high-level framework)
+- **Node.js/TypeScript**: `iii-sdk` (low-level) and `iii` (high-level framework)
 - **Python**: `iii` (low-level) and `motia` (high-level framework)
 
 ```mermaid
@@ -26,7 +26,7 @@ graph LR
     Worker -->|Result| Engine
 
     subgraph "Worker Process"
-        SDK[SDK/Bridge]
+        SDK[iii SDK]
         Functions[Registered<br/>Functions]
         SDK --> Functions
     end
@@ -39,13 +39,9 @@ graph LR
 Worker establishes WebSocket connection to the Engine:
 
 ```typescript
-import { createBridge } from '@iii-dev/sdk'
+import { init } from 'iii-sdk'
 
-const bridge = createBridge({
-  url: 'ws://127.0.0.1:49134',
-})
-
-await bridge.connect()
+const iii = await init()
 ```
 
 ### 2. Registration
@@ -54,16 +50,13 @@ Worker registers functions and triggers:
 
 ```typescript
 // Register a function
-bridge.registerFunction({
-  id: 'users::create',
-  handler: async (data) => {
-    // Business logic here
-    return { id: '123', ...data }
-  },
+iii.registerFunction({ id: 'users::create' }, async (data) => {
+  // Business logic here
+  return { id: '123', ...data }
 })
 
 // Register a trigger
-bridge.registerTrigger({
+iii.registerTrigger({
   type: 'http',
   function_id: 'users::create',
   config: {
@@ -144,21 +137,18 @@ graph TD
 ### Node.js
 
 ```typescript
-import { createBridge } from '@iii-dev/sdk'
+import { init } from 'iii-sdk'
 
-const bridge = createBridge()
+const iii = await init()
 
 // Register functions
-bridge.registerFunction({
-  id: 'greet.hello',
-  handler: async ({ name }) => {
-    return { message: `Hello, ${name}!` }
-  },
+iii.registerFunction({ id: 'greet.hello' }, async ({ name }) => {
+  return { message: `Hello, ${name}!` }
 })
 
-// Register API trigger
-bridge.registerTrigger({
-  type: 'api',
+// Register HTTP trigger
+iii.registerTrigger({
+  type: 'http',
   function_id: 'greet.hello',
   config: {
     api_path: '/greet/:name',
@@ -166,27 +156,25 @@ bridge.registerTrigger({
   },
 })
 
-// Connect to engine
-await bridge.connect()
 logger.info('Worker connected!')
 ```
 
 ### Python (iii SDK)
 
 ```python
-from iii import Bridge
+from iii import III
 
-bridge = Bridge()
+iii = III()
 
 # Register function
-@bridge.function('greet.hello')
+@iii.register_function('greet.hello')
 async def hello(data):
     name = data.get('name', 'World')
     return {'message': f'Hello, {name}!'}
 
-# Register API trigger
-bridge.register_trigger(
-    type='api',
+# Register HTTP trigger
+iii.register_trigger(
+    type='http',
     function_id='greet.hello',
     config={
         'api_path': '/greet/:name',
@@ -195,7 +183,7 @@ bridge.register_trigger(
 )
 
 # Connect to engine
-bridge.connect()
+iii.connect()
 ```
 
 ## Best Practices
@@ -216,22 +204,19 @@ bridge.connect()
     Always handle errors gracefully and return structured error responses:
 
     ```typescript
-    bridge.registerFunction({
-      id: 'users::create',
-      handler: async (data) => {
-        try {
-          const user = await createUser(data);
-          return { success: true, user };
-        } catch (error) {
-          return {
-            success: false,
-            error: {
-              code: 'USER_CREATE_FAILED',
-              message: error.message,
-            },
-          };
-        }
-      },
+    iii.registerFunction({ id: 'users::create' }, async (data) => {
+      try {
+        const user = await createUser(data);
+        return { success: true, user };
+      } catch (error) {
+        return {
+          success: false,
+          error: {
+            code: 'USER_CREATE_FAILED',
+            message: error.message,
+          },
+        };
+      }
     });
     ```
 
@@ -241,12 +226,8 @@ bridge.connect()
     Handle disconnections and implement reconnection logic:
 
     ```typescript
-    bridge.on('disconnect', () => {
-      console.log('Disconnected from engine');
-    });
-
-    bridge.on('connect', () => {
-      console.log('Connected to engine');
+    iii.onConnectionStateChange((state) => {
+      console.log('Connection state:', state);
     });
     ```
 
@@ -256,12 +237,12 @@ bridge.connect()
     Group related functions using namespaced IDs:
 
     ```typescript
-    bridge.registerFunction({ id: 'users::create', ... });
-    bridge.registerFunction({ id: 'users::update', ... });
-    bridge.registerFunction({ id: 'users::delete', ... });
+    iii.registerFunction({ id: 'users::create' }, createHandler);
+    iii.registerFunction({ id: 'users::update' }, updateHandler);
+    iii.registerFunction({ id: 'users::delete' }, deleteHandler);
 
-    bridge.registerFunction({ id: 'auth::login', ... });
-    bridge.registerFunction({ id: 'auth::logout', ... });
+    iii.registerFunction({ id: 'auth::login' }, loginHandler);
+    iii.registerFunction({ id: 'auth::logout' }, logoutHandler);
     ```
 
   </Accordion>

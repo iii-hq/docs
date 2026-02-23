@@ -212,6 +212,10 @@ const iii = init(process.env.III_BRIDGE_URL ?? 'ws://localhost:49134', {
       </ResponseField>
     </Accordion>
   </AccordionGroup>
+
+  <Callout type="info" title="Note">
+    In the Node SDK, `createStream` registers only 5 of the 6 `IStream` methods (`get`, `set`, `delete`, `list`, `listGroups`). The `update` method is **not** registered by `createStream` — atomic updates are handled by the engine's built-in stream update logic.
+  </Callout>
 </ResponseField>
 
 ### onFunctionsAvailable

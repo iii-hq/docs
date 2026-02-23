@@ -151,7 +151,7 @@ asyncio.run(main())
     </Accordion>
     <Accordion iconName="Code" title="Example" description="">
       ```python
-      result = await iii.trigger("queue::enqueue", {
+      result = await iii.trigger("enqueue", {
           "topic": "user.created",
           "data": {"user_id": "123"},
       })

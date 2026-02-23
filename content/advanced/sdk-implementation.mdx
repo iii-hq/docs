@@ -299,8 +299,8 @@ All fallible operations return `Result<T, IIIError>`. Common variants:
 
 - `IIIError::NotConnected` — WebSocket is not open
 - `IIIError::Timeout` — invocation timed out
-- `IIIError::InvocationFailed` — remote function returned an error
-- `IIIError::Serialization` — JSON serialization failed
+- `IIIError::Remote` — remote function returned an error
+- `IIIError::Serde` — JSON serialization failed
 
 ## Request and Response Models
 

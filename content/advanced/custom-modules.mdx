@@ -30,7 +30,7 @@ The module system is built around two primary traits: `CoreModule` and `Configur
 
 | Trait                  | Description                                                                                   | Key Methods                                                  |
 | ---------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| **CoreModule**         | The base trait for all modules. Handles lifecycle, identification, and function registration. | `name()`, `create()`, `initialize()`, `register_functions()` |
+| **CoreModule**         | The base trait for all modules. Handles lifecycle, identification, and function registration. | `name()`, `create()`, `initialize()`, `register_functions()`, `start_background_tasks()`, `destroy()` |
 | **ConfigurableModule** | Extends `CoreModule` to support typed configuration and pluggable adapters.                   | `build()`, `registry()`, `adapter_class_from_config()`       |
 
 ### Lifecycle Flow

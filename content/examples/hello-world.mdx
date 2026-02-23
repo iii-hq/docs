@@ -9,7 +9,7 @@ This example shows the two-step pattern at the heart of most iii workflows: an *
 ```mermaid
 graph LR
     Client -->|"GET /hello"| HelloHandler
-    HelloHandler -->|"queue::enqueue: greet.process"| ProcessHandler
+    HelloHandler -->|"enqueue: greet.process"| ProcessHandler
     ProcessHandler -->|"state::set"| State[(State)]
 ```
 
@@ -78,7 +78,7 @@ iii.registerFunction(
 
     ctx.logger.info('Hello API called', { appName, requestId })
 
-    await iii.trigger('queue::enqueue', {
+    await iii.trigger('enqueue', {
       topic: 'greet.process',
       data: {
         requestId,
@@ -122,7 +122,7 @@ async def hello_api(req: ApiRequest, ctx) -> ApiResponse:
 
     ctx.logger.info("Hello API called", {"appName": app_name, "requestId": request_id})
 
-    await iii.trigger("queue::enqueue", {
+    await iii.trigger("enqueue", {
         "topic": "greet.process",
         "data": {
             "requestId": request_id,
@@ -169,7 +169,7 @@ iii.register_function("hello.api", |input| async move {
         "requestId": request_id,
     })));
 
-    iii.trigger_void("queue::enqueue", json!({
+    iii.trigger_void("enqueue", json!({
         "topic": "greet.process",
         "data": {
             "requestId": request_id,
@@ -372,5 +372,5 @@ curl http://localhost:3111/hello
 
 - `iii.registerFunction` pairs a string ID with an async handler. The ID is referenced by all triggers bound to that function.
 - `iii.registerTrigger` binds a trigger type + config to a function ID. A function can have multiple triggers.
-- `iii.trigger('queue::enqueue', { topic, data })` publishes an event on the named topic. Any worker with a `queue` trigger on that topic will receive it.
+- `iii.trigger('enqueue', { topic, data })` publishes an event on the named topic. Any worker with a `queue` trigger on that topic will receive it.
 - `iii.trigger('state::set', { scope, key, data })` persists data to the engine's key-value store, addressed by `scope` + `key`.

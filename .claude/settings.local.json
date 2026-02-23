@@ -5,7 +5,8 @@
       "Bash(git -C /Users/ytallolayon/workspaces/personal/motia/iii-docs diff main...HEAD --stat)",
       "Bash(git -C /Users/ytallolayon/workspaces/personal/motia/iii-docs diff main...HEAD -- content/api-reference/ content/tutorials/ content/advanced/sdk-implementation.mdx)",
       "Bash(git -C /Users/ytallolayon/workspaces/personal/motia/iii-docs diff main...HEAD -- content/modules/ content/advanced/custom-modules.mdx)",
-      "Bash(git -C /Users/ytallolayon/workspaces/personal/motia/iii-docs diff main...HEAD -- content/examples/ content/trigger-types.mdx content/workers.mdx content/advanced/architecture.mdx content/advanced/deployment.mdx content/advanced/protocol.mdx)"
+      "Bash(git -C /Users/ytallolayon/workspaces/personal/motia/iii-docs diff main...HEAD -- content/examples/ content/trigger-types.mdx content/workers.mdx content/advanced/architecture.mdx content/advanced/deployment.mdx content/advanced/protocol.mdx)",
+      "Bash(grep:*)"
     ]
   }
 }

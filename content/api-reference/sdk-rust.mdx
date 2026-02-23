@@ -109,7 +109,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
   <AccordionGroup>
     <Accordion iconName="Code" title="Example" description="">
       ```rust
-      let result = iii.trigger("queue::enqueue", json!({
+      let result = iii.trigger("enqueue", json!({
           "topic": "user.created",
           "data": {"user_id": "123"},
       })).await?;
@@ -162,7 +162,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ### on_functions_available
 
-<ResponseField name="on_functions_available" type="fn(&self, callback: FunctionsAvailableCallback) => Result&lt;FunctionsAvailableGuard, IIIError&gt;" required>
+<ResponseField name="on_functions_available" type="fn(&self, callback: FunctionsAvailableCallback) => FunctionsAvailableGuard" required>
   Subscribes to function availability events. Drop the returned `FunctionsAvailableGuard` to unsubscribe.
 </ResponseField>
 
@@ -195,18 +195,20 @@ println!("Old: {:?}, New: {:?}", result.old_value, result.new_value);
 | `UpdateOp::increment(path, by)` | Increment a numeric field |
 | `UpdateOp::decrement(path, by)` | Decrement a numeric field |
 | `UpdateOp::remove(path)` | Remove a field |
-| `UpdateOp::merge(path, value)` | Deep-merge an object into a field |
+| `UpdateOp::merge(value)` | Deep-merge an object into the root |
+| `UpdateOp::merge_at(path, value)` | Deep-merge an object into a field |
 
 You can also use the `UpdateBuilder` for a fluent API:
 
 ```rust
 use iii_sdk::UpdateBuilder;
 
-let result = UpdateBuilder::new(&streams, "orders::user-1::order-1")
+let ops = UpdateBuilder::new()
     .increment("total", 50)
     .set("status", json!("processing"))
-    .execute()
-    .await?;
+    .build();
+
+let result = streams.update("orders::user-1::order-1", ops).await?;
 ```
 
 ## Error Handling
@@ -217,8 +219,10 @@ All fallible operations return `Result<T, IIIError>`. Common variants:
 |---|---|
 | `IIIError::NotConnected` | WebSocket is not open |
 | `IIIError::Timeout` | Invocation timed out |
-| `IIIError::InvocationFailed { code, message }` | Remote function returned an error |
-| `IIIError::Serialization(err)` | JSON serialization failed |
+| `IIIError::Remote { code, message }` | Remote function returned an error |
+| `IIIError::Serde(err)` | JSON serialization failed |
+| `IIIError::Handler(String)` | Handler returned an error |
+| `IIIError::WebSocket(String)` | WebSocket transport error |
 
 ## Types
 
@@ -231,7 +235,7 @@ use iii_sdk::{
     IIIError,
     FunctionInfo, WorkerInfo, WorkerMetadata,
     TriggerInfo,
-    Logger, LoggerInvoker,
+    Logger,
     Trigger, TriggerConfig, TriggerHandler,
     Streams, UpdateBuilder,
     Value,  // re-export of serde_json::Value
