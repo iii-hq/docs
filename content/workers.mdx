@@ -79,9 +79,9 @@ sequenceDiagram
     Note over W,E: Worker Connected & Registered
 
     C->>E: HTTP POST /users
-    E->>W: invokefunction { function_path: "users.create" }
+    E->>W: invoke { function_id: "users::create" }
     W->>W: Execute handler
-    W-->>E: invocationresult { result: {...} }
+    W-->>E: result { data: {...} }
     E-->>C: HTTP 200 OK
 ```
 
@@ -101,7 +101,7 @@ The Engine maintains a registry of connected workers:
 Each worker tracks:
 
 - **UUID**: Unique identifier assigned on connection
-- **Function Paths**: List of registered functions (e.g., `users.create`, `api.echo`)
+- **Function Paths**: List of registered functions (e.g., `users::create`, `api::echo`)
 - **Active Invocations**: Currently executing requests
 - **WebSocket Channel**: Communication channel to the Engine
 
@@ -120,9 +120,9 @@ graph TD
     E -.-> W2
     E -.-> W3
 
-    W1 -->|Functions:<br/>api.*| E
-    W2 -->|Functions:<br/>data.*| E
-    W3 -->|Functions:<br/>jobs.*| E
+    W1 -->|"Functions: api::*"| E
+    W2 -->|"Functions: data::*"| E
+    W3 -->|"Functions: jobs::*"| E
 ```
 
 **Benefits:**
@@ -181,20 +181,20 @@ iii.register_trigger(
 )
 
 # Connect to engine
-bridge.connect()
+await iii.connect()
 ```
 
 ## Best Practices
 
 <AccordionGroup>
   <Accordion title="Function Naming">
-    Use dot notation to organize functions: `service.action`
+    Use double-colon notation to organize functions: `service::action`
 
     Examples:
-    - `users.create`
-    - `users.update`
-    - `auth.login`
-    - `payments.process`
+    - `users::create`
+    - `users::update`
+    - `auth::login`
+    - `payments::process`
 
   </Accordion>
 
@@ -202,9 +202,9 @@ bridge.connect()
     Always handle errors gracefully and return structured error responses:
 
     ```typescript
-    bridge.registerFunction({
-      function_path: 'users.create',
-      handler: async (data) => {
+    iii.registerFunction(
+      { function_path: 'users::create' },
+      async (data) => {
         try {
           const user = await createUser(data);
           return { success: true, user };
@@ -217,41 +217,35 @@ bridge.connect()
             },
           };
         }
-      },
-    });
+      }
+    )
     ```
 
   </Accordion>
 
   <Accordion title="Connection Management">
-    Handle disconnections and implement reconnection logic:
+    Monitor connection state changes using the SDK:
 
     ```typescript
-    bridge.on('disconnect', () => {
-      console.log('Disconnected from engine');
-    });
-
-    bridge.on('connect', () => {
-      console.log('Connected to engine');
-    });
+    iii.onConnectionStateChange((state) => {
+      console.log('Connection state:', state)
+    })
     ```
 
   </Accordion>
 
-  <Accordion title="Service Organization">
-    Group related functions under services for better organization:
+  <Accordion title="Function Organization">
+    Group related functions by namespace:
 
     ```typescript
-    // User service
-    bridge.registerService({ id: 'users' });
-    bridge.registerFunction({ function_path: 'users.create', ... });
-    bridge.registerFunction({ function_path: 'users.update', ... });
-    bridge.registerFunction({ function_path: 'users.delete', ... });
+    // User functions
+    iii.registerFunction({ function_path: 'users::create' }, createHandler)
+    iii.registerFunction({ function_path: 'users::update' }, updateHandler)
+    iii.registerFunction({ function_path: 'users::delete' }, deleteHandler)
 
-    // Auth service
-    bridge.registerService({ id: 'auth' });
-    bridge.registerFunction({ function_path: 'auth.login', ... });
-    bridge.registerFunction({ function_path: 'auth.logout', ... });
+    // Auth functions
+    iii.registerFunction({ function_path: 'auth::login' }, loginHandler)
+    iii.registerFunction({ function_path: 'auth::logout' }, logoutHandler)
     ```
 
   </Accordion>

@@ -42,7 +42,7 @@ from iii import III
 async def main():
     iii = III('ws://localhost:49134')
 
-    async def cleanup_sessions(data):
+    async def cleanup_sessions():
         count = await delete_expired_sessions()
         return {'deleted': count}
 
@@ -60,9 +60,9 @@ asyncio.run(main())
 <Tab value="TypeScript">
 ```typescript
 iii.registerTrigger({
-  trigger_type: 'cron',
+  type: 'cron',
   function_id: 'cleanup::expired-sessions',
-  config: { schedule: '0 */6 * * *' },
+  config: { cron: '0 */6 * * *' },
 })
 ```
 </Tab>
@@ -71,7 +71,7 @@ iii.registerTrigger({
 iii.register_trigger(
     type='cron',
     function_id='cleanup::expired-sessions',
-    config={'schedule': '0 */6 * * *'},
+    config={'cron': '0 */6 * * *'},
 )
 ```
 </Tab>

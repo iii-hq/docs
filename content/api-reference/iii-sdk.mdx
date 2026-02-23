@@ -148,7 +148,7 @@ iii.trigger_void("notifications::send", json!({
 </Tabs>
 
 <ResponseField name="triggerVoid" type="<TInput>(function_id: string, data: TInput) => void" required>
-  Triggers a function without waiting for a response.
+  Triggers a function without waiting for a response. In Rust, returns `Result<(), IIIError>` since serialization can fail.
 
   <AccordionGroup>
     <Accordion iconName="Settings" title="Parameters" description="">
