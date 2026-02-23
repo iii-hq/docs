@@ -268,22 +268,22 @@ iii.registerTrigger({
 Store user profiles in state and react when they change:
 
 ```typescript
-await iii.call('state::set', {
+await iii.trigger('state::set', {
   scope: 'users',
   key: 'user-123',
   data: { name: 'Alice', email: 'alice@example.com', preferences: { theme: 'dark' } },
 })
 
-const profile = await iii.call('state::get', { scope: 'users', key: 'user-123' })
+const profile = await iii.trigger('state::get', { scope: 'users', key: 'user-123' })
 
-await iii.call('state::set', {
+await iii.trigger('state::set', {
   scope: 'users',
   key: 'user-123',
   data: { name: 'Alice', email: 'alice@example.com', preferences: { theme: 'light' } },
 })
 
-const allUsers = await iii.call('state::list', { scope: 'users' })
-const scopes = await iii.call('state::list_groups', {})
+const allUsers = await iii.trigger('state::list', { scope: 'users' })
+const scopes = await iii.trigger('state::list_groups', {})
 ```
 
 ### Usage Example: Conditional Trigger

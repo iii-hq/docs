@@ -5,21 +5,19 @@ description: 'Triggers are entrypoints into a iii system.'
 
 Triggers are entrypoints into an iii system.
 
-Each Trigger defines the conditions which will cause it to fire, a payload it accepts, and a Function that it will invoke. When the Trigger does fire the Function is invoked with that payload.
-
-The basic flow looks something like this, when Triggers are activated Functions are called, although there are a few more layers in between.
+Each Trigger defines the conditions which will cause it to fire, a payload it accepts, and a Function that it will trigger. When the Trigger fires, the Function is executed with that payload.
 
 ```mermaid
 graph LR
-    User((User)) -->|invokes| Trigger
+    User((User)) -->|request| Trigger
 
     subgraph Trigger[Trigger]
-        Config[POST /users]
+        Config["POST /users"]
     end
     subgraph Function[Function]
-        Fn[create_user]
+        Fn["users::create"]
     end
-    Trigger -->|calls| Function
+    Trigger -->|triggers| Function
 ```
 
 <Callout title="Unrolling the backend" type="info">

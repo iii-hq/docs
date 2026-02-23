@@ -18,7 +18,7 @@ graph TD
     Event[Event Trigger] -->|Invokes| Func
     Cron[Cron Trigger] -->|Invokes| Func
     Other[Another Function] -->|Invokes| Func
-    Direct[Direct SDK Call] -->|Invokes| Func
+    Direct[Direct SDK trigger] -->|Invokes| Func
 
     Func -->|Calls| DB[(Database)]
     Func -->|Calls| External[External API]

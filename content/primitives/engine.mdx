@@ -3,7 +3,7 @@ title: 'Engine'
 description: 'The Engine is primarily responsible for routing requests.'
 ---
 
-The Engine is primarily responsible for routing requests. When a trigger invokes a Function the Engine itself handles the routing and sends that message to a Worker that contains that Function.
+The Engine is primarily responsible for routing requests. When a Trigger fires, the Engine handles the routing and sends the message to the Worker that contains the target Function.
 
 The iii Engine is the central orchestrator of a iii system. It knows where every part of your infrastructure lives and routes requests to those parts.
 
@@ -11,21 +11,21 @@ This architecture is what enables application code to be decoupled from the infr
 
 ```mermaid
 graph TB
-    User((User)) -->|invokes| Trigger
+    User((User)) -->|request| Trigger
 
     subgraph Trigger[Trigger]
-        Config[POST /users]
+        Config["POST /users"]
     end
     subgraph Engine[Engine]
-        Fn["(target_function, payload)"]
+        Fn["(function_id, payload)"]
     end
-    Trigger -->|"(create_user, payload)"| Engine
+    Trigger -->|"(users::create, payload)"| Engine
     subgraph Worker[Worker]
         Fn2[Function]
         Fn3[Function]
         Fn4[Function]
     end
-Engine -->|"(create_user, payload)"| Worker
+Engine -->|"(users::create, payload)"| Worker
 ```
 
 <Callout title="Context" type="info">

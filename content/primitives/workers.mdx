@@ -5,7 +5,7 @@ description: 'Workers are what handle Function invocation within iii.'
 
 Workers are what handle Function invocation within iii.
 
-When the Engine sends a Worker a request the Worker then executes that request and routes it to the correct Function. When the Function is done with its work it may optionally return a result to the Worker. If it does the Worker forwards this result back to the Engine as a new Trigger and the lifecycle of a iii operation starts over again.
+When the Engine sends a Worker a request the Worker then executes that request and routes it to the correct Function. When the Function is done with its work it may optionally return a result to the Worker, or it may `trigger()` other Functions to continue the workflow.
 
 Workers encapsulate the actual components of a iii system. They can encapsulate existing infrastructure, external services, or brand new green field development.
 
@@ -13,24 +13,24 @@ Workers are what enables any sort of application architecture, with any combinat
 
 ```mermaid
 graph TB
-    User((User)) -->|invokes| Trigger
+    User((User)) -->|request| Trigger
 
     subgraph Trigger[Trigger]
-        Config[POST /users]
+        Config["POST /users"]
     end
 
-    Trigger -->|"(create_user, payload)"| Engine[Engine]
+    Trigger -->|"(users::create, payload)"| Engine[Engine]
 
-    Engine -->|"(create_user, payload)"| Function
+    Engine -->|"(users::create, payload)"| Function
 
     subgraph Worker[Worker]
-        Function["Function: create_user(payload, context)"]
+        Function["Function: users::create(payload, context)"]
         Function --> P1
         subgraph P1[Process Request]
-            P2["Invoke Trigger(s)"]
+            P2["trigger() / triggerVoid()"]
         end
     end
 
-    P2 -.->|optional| Triggers(("Trigger(s)"))
+    P2 -.->|optional| OtherFn(("Other Functions"))
     P2 -.->|optional| P3(("Response"))
 ```

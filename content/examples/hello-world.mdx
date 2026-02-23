@@ -78,7 +78,7 @@ iii.registerFunction(
 
     ctx.logger.info('Hello API called', { appName, requestId })
 
-    await iii.call('queue::enqueue', {
+    await iii.trigger('queue::enqueue', {
       topic: 'greet.process',
       data: {
         requestId,
@@ -122,7 +122,7 @@ async def hello_api(req: ApiRequest, ctx) -> ApiResponse:
 
     ctx.logger.info("Hello API called", {"appName": app_name, "requestId": request_id})
 
-    await iii.call("queue::enqueue", {
+    await iii.trigger("queue::enqueue", {
         "topic": "greet.process",
         "data": {
             "requestId": request_id,
@@ -169,7 +169,7 @@ iii.register_function("hello.api", |input| async move {
         "requestId": request_id,
     })));
 
-    iii.call_void("queue::enqueue", json!({
+    iii.trigger_void("queue::enqueue", json!({
         "topic": "greet.process",
         "data": {
             "requestId": request_id,
@@ -221,7 +221,7 @@ iii.registerFunction(
 
     const greeting = `${greetingPrefix} ${appName}!`
 
-    await iii.call('state::set', {
+    await iii.trigger('state::set', {
       scope: 'greetings',
       key: requestId,
       data: {
@@ -259,7 +259,7 @@ async def greet_process(data: dict, ctx) -> None:
 
     greeting = f"{greeting_prefix} {app_name}!"
 
-    await iii.call("state::set", {
+    await iii.trigger("state::set", {
         "scope": "greetings",
         "key": request_id,
         "data": {
@@ -298,7 +298,7 @@ iii.register_function("greet.process", |input| async move {
 
     let greeting = format!("{} {}!", prefix, app_name);
 
-    iii.call_void("state::set", json!({
+    iii.trigger_void("state::set", json!({
         "scope": "greetings",
         "key": request_id,
         "data": {
@@ -368,5 +368,5 @@ curl http://localhost:3111/hello
 
 - `iii.registerFunction` pairs a string ID with an async handler. The ID is referenced by all triggers bound to that function.
 - `iii.registerTrigger` binds a trigger type + config to a function ID. A function can have multiple triggers.
-- `iii.call('queue::enqueue', { topic, data })` publishes an event on the named topic. Any worker with a `queue` trigger on that topic will receive it.
-- `iii.call('state::set', { scope, key, data })` persists data to the engine's key-value store, addressed by `scope` + `key`.
+- `iii.trigger('queue::enqueue', { topic, data })` publishes an event to the named topic. Any worker with a `queue` trigger on that topic will receive it.
+- `iii.trigger('state::set', { scope, key, data })` persists data to the engine's key-value store, addressed by `scope` + `key`.

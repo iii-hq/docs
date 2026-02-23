@@ -454,7 +454,7 @@ iii.registerTrigger({
 ```typescript
 const processFn = iii.registerFunction({ id: 'orders.process' }, async (order) => {
   await saveOrder(order)
-  await iii.call('enqueue', {
+  await iii.trigger('enqueue', {
     topic: 'order.processed',
     data: order,
   })

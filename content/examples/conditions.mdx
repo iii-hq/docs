@@ -157,7 +157,7 @@ iii.registerFunction(
 
     ctx.logger.info('Processing high-value order', { amount: data.amount })
 
-    await iii.call('queue::enqueue', {
+    await iii.trigger('queue::enqueue', {
       topic: 'order.processed',
       data: { ...data, processedAt: new Date().toISOString() },
     })
@@ -185,7 +185,7 @@ async def orders_high_value(data: dict, ctx) -> None:
 
     ctx.logger.info("Processing high-value order", {"amount": amount})
 
-    await iii.call("queue::enqueue", {
+    await iii.trigger("queue::enqueue", {
         "topic": "order.processed",
         "data": {**data, "processedAt": __import__("datetime").datetime.utcnow().isoformat()},
     })
@@ -211,7 +211,7 @@ iii.register_function("orders.high_value", |input| async move {
 
     ctx.logger.info("Processing high-value order", Some(json!({ "amount": amount })));
 
-    iii.call_void("queue::enqueue", json!({
+    iii.trigger_void("queue::enqueue", json!({
         "topic": "order.processed",
         "data": { "amount": amount, "processedAt": chrono::Utc::now().to_rfc3339() },
     }))?;
