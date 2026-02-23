@@ -22,9 +22,9 @@ graph LR
 |--------|---------|----------|
 | `trigger(id, data)` | Result from the Function | When you need the response |
 | `triggerVoid(id, data)` | Nothing (fire-and-forget) | When you don't need the response |
-| `registerTrigger()` | — | Automatic invocation via HTTP, cron, queue, etc. |
+| `registerTrigger()` | n/a | Automatic invocation via HTTP, cron, queue, etc. |
 
-### `trigger()` — Invoke and await result
+### `trigger()`: invoke and await result
 
 ```typescript
 import { init } from '@iii-dev/sdk'
@@ -37,7 +37,7 @@ const user = await trigger('users::create', {
 })
 ```
 
-### `triggerVoid()` — Fire and forget
+### `triggerVoid()`: fire and forget
 
 ```typescript
 import { init } from '@iii-dev/sdk'
@@ -50,7 +50,7 @@ triggerVoid('enqueue', {
 })
 ```
 
-### `registerTrigger()` — Automatic invocation
+### `registerTrigger()`: automatic invocation
 
 Bind a Function to an event source so it fires automatically:
 
