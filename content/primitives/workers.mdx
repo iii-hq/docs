@@ -56,7 +56,7 @@ import { init } from '@iii-dev/sdk'
 const iii = init('ws://localhost:49134', { workerName: 'user-service' })
 
 iii.registerFunction(
-  { function_path: 'users::create' },
+  { id: 'users::create' },
   async (data) => {
     const user = await db.createUser(data)
     iii.triggerVoid('emails::welcome', { to: user.email })

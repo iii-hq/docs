@@ -26,7 +26,7 @@ import { init } from '@iii-dev/sdk'
 const iii = init('ws://localhost:49134')
 
 iii.registerFunction(
-  { function_path: 'cleanup::expired-sessions' },
+  { id: 'cleanup::expired-sessions' },
   async () => {
     const count = await deleteExpiredSessions()
     return { deleted: count }

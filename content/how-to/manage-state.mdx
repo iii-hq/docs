@@ -27,7 +27,7 @@ import { init } from '@iii-dev/sdk'
 const iii = init('ws://localhost:49134')
 
 iii.registerFunction(
-  { function_path: 'users::create' },
+  { id: 'users::create' },
   async (data) => {
     const user = { id: crypto.randomUUID(), ...data }
 
@@ -73,7 +73,7 @@ asyncio.run(main())
 
 ```typescript
 iii.registerFunction(
-  { function_path: 'users::get' },
+  { id: 'users::get' },
   async (data) => {
     const user = await iii.trigger('state::get', {
       scope: 'users',

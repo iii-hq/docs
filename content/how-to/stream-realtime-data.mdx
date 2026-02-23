@@ -28,7 +28,7 @@ import { init } from '@iii-dev/sdk'
 const iii = init('ws://localhost:49134')
 
 iii.registerFunction(
-  { function_path: 'chat::send-message' },
+  { id: 'chat::send-message' },
   async (data) => {
     const message = {
       id: crypto.randomUUID(),

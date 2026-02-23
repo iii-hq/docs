@@ -19,7 +19,7 @@ import { init } from '@iii-dev/sdk'
 const iii = init('ws://localhost:49134')
 
 iii.registerFunction(
-  { function_path: 'users::create' },
+  { id: 'users::create' },
   async (req) => {
     const { name, email } = req.body
     const user = { id: crypto.randomUUID(), name, email }

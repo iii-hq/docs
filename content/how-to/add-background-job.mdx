@@ -27,7 +27,7 @@ import { init } from '@iii-dev/sdk'
 const iii = init('ws://localhost:49134')
 
 iii.registerFunction(
-  { function_path: 'emails::send-welcome' },
+  { id: 'emails::send-welcome' },
   async (data) => {
     await sendEmail(data.to, 'Welcome!', data.body)
     return { sent: true }
@@ -63,7 +63,7 @@ Use `triggerVoid()` (fire-and-forget) so the calling Function doesn't wait:
 <Tab value="TypeScript">
 ```typescript
 iii.registerFunction(
-  { function_path: 'users::create' },
+  { id: 'users::create' },
   async (req) => {
     const user = await createUser(req.body)
 

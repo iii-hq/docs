@@ -176,7 +176,7 @@ Registers a function with the iii engine. Once registered, the function can be t
 <Tab value="TypeScript">
 ```typescript
 const ref = iii.registerFunction(
-  { function_path: 'users::create' },
+  { id: 'users::create' },
   async (data: { name: string }) => {
     return { id: crypto.randomUUID(), name: data.name }
   }
@@ -209,7 +209,7 @@ iii.register_function("users::create", |data: Value| async move {
         The function registration input.
 
         <Expandable title="RegisterFunctionInput">
-          <ResponseField name="function_path" type="string" required>
+          <ResponseField name="id" type="string" required>
             The function identifier (e.g., `'users::create'`).
           </ResponseField>
           <ResponseField name="description" type="string">

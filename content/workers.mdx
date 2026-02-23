@@ -50,7 +50,7 @@ Worker registers functions and triggers:
 
 ```typescript
 iii.registerFunction(
-  { function_path: 'users::create' },
+  { id: 'users::create' },
   async (data) => {
     return { id: '123', ...data }
   }
@@ -142,7 +142,7 @@ import { init } from '@iii-dev/sdk'
 const iii = init('ws://localhost:49134')
 
 iii.registerFunction(
-  { function_path: 'greet::hello' },
+  { id: 'greet::hello' },
   async ({ name }) => {
     return { message: `Hello, ${name}!` }
   }
@@ -161,27 +161,30 @@ iii.registerTrigger({
 ### Python
 
 ```python
+import asyncio
 from iii import III
 
-iii = III('ws://localhost:49134')
+async def main():
+    iii = III('ws://localhost:49134')
 
-async def hello(data):
-    name = data.get('name', 'World')
-    return {'message': f'Hello, {name}!'}
+    async def hello(data):
+        name = data.get('name', 'World')
+        return {'message': f'Hello, {name}!'}
 
-iii.register_function('greet::hello', hello)
+    iii.register_function('greet::hello', hello)
 
-iii.register_trigger(
-    type='http',
-    function_id='greet::hello',
-    config={
-        'api_path': '/greet/:name',
-        'http_method': 'GET',
-    }
-)
+    iii.register_trigger(
+        type='http',
+        function_id='greet::hello',
+        config={
+            'api_path': '/greet/:name',
+            'http_method': 'GET',
+        }
+    )
 
-# Connect to engine
-await iii.connect()
+    await iii.connect()
+
+asyncio.run(main())
 ```
 
 ## Best Practices
@@ -203,7 +206,7 @@ await iii.connect()
 
     ```typescript
     iii.registerFunction(
-      { function_path: 'users::create' },
+      { id: 'users::create' },
       async (data) => {
         try {
           const user = await createUser(data);
@@ -239,13 +242,13 @@ await iii.connect()
 
     ```typescript
     // User functions
-    iii.registerFunction({ function_path: 'users::create' }, createHandler)
-    iii.registerFunction({ function_path: 'users::update' }, updateHandler)
-    iii.registerFunction({ function_path: 'users::delete' }, deleteHandler)
+    iii.registerFunction({ id: 'users::create' }, createHandler)
+    iii.registerFunction({ id: 'users::update' }, updateHandler)
+    iii.registerFunction({ id: 'users::delete' }, deleteHandler)
 
     // Auth functions
-    iii.registerFunction({ function_path: 'auth::login' }, loginHandler)
-    iii.registerFunction({ function_path: 'auth::logout' }, logoutHandler)
+    iii.registerFunction({ id: 'auth::login' }, loginHandler)
+    iii.registerFunction({ id: 'auth::logout' }, logoutHandler)
     ```
 
   </Accordion>
