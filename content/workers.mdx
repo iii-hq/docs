@@ -26,7 +26,7 @@ graph LR
     Worker -->|Result| Engine
 
     subgraph "Worker Process"
-        SDK[SDK/Bridge]
+        SDK[SDK]
         Functions[Registered<br/>Functions]
         SDK --> Functions
     end
@@ -39,39 +39,26 @@ graph LR
 Worker establishes WebSocket connection to the Engine:
 
 ```typescript
-import { createBridge } from '@iii-dev/sdk'
+import { init } from '@iii-dev/sdk'
 
-const bridge = createBridge({
-  url: 'ws://127.0.0.1:49134',
-})
-
-await bridge.connect()
+const iii = init('ws://127.0.0.1:49134')
 ```
 
 ### 2. Registration
 
-Worker registers services, functions, and triggers:
+Worker registers functions and triggers:
 
 ```typescript
-// Register a service (logical grouping)
-bridge.registerService({
-  id: 'users',
-  name: 'User Management',
-})
-
-// Register a function
-bridge.registerFunction({
-  function_path: 'users.create',
-  handler: async (data) => {
-    // Business logic here
+iii.registerFunction(
+  { function_path: 'users::create' },
+  async (data) => {
     return { id: '123', ...data }
-  },
-})
+  }
+)
 
-// Register a trigger
-bridge.registerTrigger({
-  trigger_type: 'api',
-  function_path: 'users.create',
+iii.registerTrigger({
+  trigger_type: 'http',
+  function_id: 'users::create',
   config: {
     api_path: '/users',
     http_method: 'POST',
@@ -150,53 +137,46 @@ graph TD
 ### Node.js
 
 ```typescript
-import { createBridge } from '@iii-dev/sdk'
+import { init } from '@iii-dev/sdk'
 
-const bridge = createBridge()
+const iii = init('ws://localhost:49134')
 
-// Register functions
-bridge.registerFunction({
-  function_path: 'greet.hello',
-  handler: async ({ name }) => {
+iii.registerFunction(
+  { function_path: 'greet::hello' },
+  async ({ name }) => {
     return { message: `Hello, ${name}!` }
-  },
-})
+  }
+)
 
-// Register API trigger
-bridge.registerTrigger({
-  trigger_type: 'api',
-  function_path: 'greet.hello',
+iii.registerTrigger({
+  trigger_type: 'http',
+  function_id: 'greet::hello',
   config: {
     api_path: '/greet/:name',
     http_method: 'GET',
   },
 })
-
-// Connect to engine
-await bridge.connect()
-logger.info('Worker connected!')
 ```
 
-### Python (iii SDK)
+### Python
 
 ```python
-from iii import Bridge
+from iii import III
 
-bridge = Bridge()
+iii = III('ws://localhost:49134')
 
-# Register function
-@bridge.function('greet.hello')
 async def hello(data):
     name = data.get('name', 'World')
     return {'message': f'Hello, {name}!'}
 
-# Register API trigger
-bridge.register_trigger(
-    trigger_type='api',
-    function_path='greet.hello',
+iii.register_function('greet::hello', hello)
+
+iii.register_trigger(
+    type='http',
+    function_id='greet::hello',
     config={
         'api_path': '/greet/:name',
-        'http_method': 'GET'
+        'http_method': 'GET',
     }
 )
 
