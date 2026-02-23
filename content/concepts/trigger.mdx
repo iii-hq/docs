@@ -5,6 +5,17 @@ description: 'Three ways to invoke any registered Function.'
 
 A Trigger is how a Function gets executed. There are three ways to trigger a Function in iii.
 
+```mermaid
+graph LR
+    T1["trigger()"] --> Fn
+    T2["triggerVoid()"] --> Fn
+    RT["registerTrigger()"] -.->|HTTP, cron, queue…| Fn
+
+    subgraph Engine
+        Fn[Function]
+    end
+```
+
 ## Three Ways to Trigger
 
 | Method | Returns | Use Case |
