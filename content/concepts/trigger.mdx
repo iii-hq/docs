@@ -40,6 +40,10 @@ const user = await trigger('users::create', {
 ### `triggerVoid()` — Fire and forget
 
 ```typescript
+import { init } from '@iii-dev/sdk'
+
+const { triggerVoid } = init('ws://engine:8080')
+
 triggerVoid('enqueue', {
   topic: 'user.created',
   data: { userId: '123' }
@@ -51,6 +55,10 @@ triggerVoid('enqueue', {
 Bind a Function to an event source so it fires automatically:
 
 ```typescript
+import { init } from '@iii-dev/sdk'
+
+const { registerTrigger } = init('ws://engine:8080')
+
 registerTrigger({
   type: 'http',
   function_id: 'users::create',
