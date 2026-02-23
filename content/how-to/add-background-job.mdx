@@ -37,16 +37,20 @@ iii.registerFunction(
 </Tab>
 <Tab value="Python">
 ```python
+import asyncio
 from iii import III
 
-iii = III('ws://localhost:49134')
+async def main():
+    iii = III('ws://localhost:49134')
 
-async def send_welcome(data):
-    await send_email(data['to'], 'Welcome!', data['body'])
-    return {'sent': True}
+    async def send_welcome(data):
+        await send_email(data['to'], 'Welcome!', data['body'])
+        return {'sent': True}
 
-iii.register_function('emails::send-welcome', send_welcome)
-await iii.connect()
+    iii.register_function('emails::send-welcome', send_welcome)
+    await iii.connect()
+
+asyncio.run(main())
 ```
 </Tab>
 </Tabs>

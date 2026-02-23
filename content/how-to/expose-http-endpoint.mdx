@@ -1,6 +1,6 @@
 ---
 title: 'Expose an HTTP Endpoint'
-description: 'How to register a Function and expose it as a REST API endpoint.'
+description: 'How to register a function and expose it as a REST API endpoint.'
 ---
 
 ## Goal
@@ -30,18 +30,22 @@ iii.registerFunction(
 </Tab>
 <Tab value="Python">
 ```python
+import asyncio, uuid
 from iii import III
-import uuid
 
-iii = III('ws://localhost:49134')
+async def main():
+    iii = III('ws://localhost:49134')
 
-async def create_user(req):
-    name = req['body']['name']
-    user = {'id': str(uuid.uuid4()), 'name': name}
-    return {'status_code': 201, 'body': user}
+    async def create_user(req):
+        name = req['body']['name']
+        email = req['body']['email']
+        user = {'id': str(uuid.uuid4()), 'name': name, 'email': email}
+        return {'status_code': 201, 'body': user}
 
-iii.register_function('users::create', create_user)
-await iii.connect()
+    iii.register_function('users::create', create_user)
+    await iii.connect()
+
+asyncio.run(main())
 ```
 </Tab>
 </Tabs>

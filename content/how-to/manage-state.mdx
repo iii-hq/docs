@@ -1,6 +1,6 @@
 ---
 title: 'Manage Shared State'
-description: 'How to read, write, and update shared state across Functions.'
+description: 'How to read, write, and update shared state across functions.'
 ---
 
 ## Goal
@@ -44,24 +44,27 @@ iii.registerFunction(
 </Tab>
 <Tab value="Python">
 ```python
+import asyncio, uuid
 from iii import III
-import uuid
 
-iii = III('ws://localhost:49134')
+async def main():
+    iii = III('ws://localhost:49134')
 
-async def create_user(data):
-    user = {'id': str(uuid.uuid4()), **data}
+    async def create_user(data):
+        user = {'id': str(uuid.uuid4()), **data}
 
-    await iii.trigger('state::set', {
-        'scope': 'users',
-        'key': user['id'],
-        'data': user,
-    })
+        await iii.trigger('state::set', {
+            'scope': 'users',
+            'key': user['id'],
+            'data': user,
+        })
 
-    return user
+        return user
 
-iii.register_function('users::create', create_user)
-await iii.connect()
+    iii.register_function('users::create', create_user)
+    await iii.connect()
+
+asyncio.run(main())
 ```
 </Tab>
 </Tabs>

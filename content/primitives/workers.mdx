@@ -67,29 +67,38 @@ iii.registerFunction(
 </Tab>
 <Tab value="Python">
 ```python
+import asyncio
 from iii import III
 
-iii = III('ws://localhost:49134')
+async def main():
+    iii = III('ws://localhost:49134')
 
-async def create_user(data):
-    user = await db.create_user(data)
-    iii.trigger_void('emails::welcome', {'to': user['email']})
-    return user
+    async def create_user(data):
+        user = await db.create_user(data)
+        iii.trigger_void('emails::welcome', {'to': user['email']})
+        return user
 
-iii.register_function('users::create', create_user)
-await iii.connect()
+    iii.register_function('users::create', create_user)
+    await iii.connect()
+
+asyncio.run(main())
 ```
 </Tab>
 <Tab value="Rust">
 ```rust
 use iii::III;
+use std::sync::Arc;
 
-let iii = III::new("ws://localhost:49134");
+let iii = Arc::new(III::new("ws://localhost:49134"));
+let iii_clone = iii.clone();
 
-iii.register_function("users::create", |data: Value| async move {
-    let user = db::create_user(&data).await?;
-    iii.trigger_void("emails::welcome", json!({"to": user.email}))?;
-    Ok(json!(user))
+iii.register_function("users::create", move |data: Value| {
+    let iii = iii_clone.clone();
+    async move {
+        let user = db::create_user(&data).await?;
+        iii.trigger_void("emails::welcome", json!({"to": user.email}))?;
+        Ok(json!(user))
+    }
 });
 
 iii.connect().await?;

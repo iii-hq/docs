@@ -51,30 +51,33 @@ iii.registerFunction(
 </Tab>
 <Tab value="Python">
 ```python
+import asyncio, uuid, time
 from iii import III
-import uuid, time
 
-iii = III('ws://localhost:49134')
+async def main():
+    iii = III('ws://localhost:49134')
 
-async def send_message(data):
-    message = {
-        'id': str(uuid.uuid4()),
-        'text': data['text'],
-        'author': data['author'],
-        'timestamp': int(time.time() * 1000),
-    }
+    async def send_message(data):
+        message = {
+            'id': str(uuid.uuid4()),
+            'text': data['text'],
+            'author': data['author'],
+            'timestamp': int(time.time() * 1000),
+        }
 
-    await iii.trigger('stream::set', {
-        'stream_name': 'chat',
-        'group_id': data['room_id'],
-        'item_id': message['id'],
-        'data': message,
-    })
+        await iii.trigger('stream::set', {
+            'stream_name': 'chat',
+            'group_id': data['roomId'],
+            'item_id': message['id'],
+            'data': message,
+        })
 
-    return message
+        return message
 
-iii.register_function('chat::send-message', send_message)
-await iii.connect()
+    iii.register_function('chat::send-message', send_message)
+    await iii.connect()
+
+asyncio.run(main())
 ```
 </Tab>
 </Tabs>
