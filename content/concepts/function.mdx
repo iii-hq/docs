@@ -172,13 +172,13 @@ await iii.trigger('state::set', {
 Function IDs use a `namespace::name` convention to organize related functions:
 
 ```
-users::create
-users::get
-orders::process-payment
-notifications::send-email
+math::add
+math::multiply
+orders::process
+notifications::send
 ```
 
-This is a naming convention — the `::` separator has no special meaning to the engine.
+The `engine::` prefix is reserved for internal engine functions.
 
 <Card icon={<Zap />} title="Triggers" href="/docs/concepts/trigger">
   Learn all the ways to invoke a Function.
