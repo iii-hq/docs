@@ -1,9 +1,9 @@
 ---
 title: 'Function'
-description: 'Register any functionality with the iii engine and make it callable from anywhere — any language, any worker.'
+description: 'Register any functionality with the iii engine and make it triggerable from anywhere — any language, any worker.'
 ---
 
-A Function is an async handler identified by a string ID. You write it in any language (TypeScript, Python, Rust), register it with the engine over WebSocket, and it becomes callable from **anywhere** in the system — other workers, other languages, other machines. The engine handles routing, serialization, and delivery.
+A Function is an async handler identified by a string ID. You write it in any language (TypeScript, Python, Rust), register it with the engine over WebSocket, and it becomes triggerable from **anywhere** in the system — other workers, other languages, other machines. The engine handles routing, serialization, and delivery.
 
 <Callout title="Everything is a Function" type="info">
   HTTP endpoints, queue consumers, cron jobs, state operations — they're all Functions under the hood. A legacy API, a serverless function, or a simple local handler all become the same first-class citizen once registered.
@@ -81,9 +81,9 @@ Once registered, `math::add` is available to the entire system.
 
 ## Use a Function
 
-There are three ways to invoke a registered Function:
+There are three ways to trigger a registered Function:
 
-### `trigger()` — call and get the result
+### `trigger()` — trigger and get the result
 
 ```typescript
 const result = await iii.trigger('math::add', { a: 2, b: 3 })
@@ -100,9 +100,9 @@ iii.triggerVoid('notifications::send', {
 // returns immediately, doesn't wait for result
 ```
 
-### `registerTrigger()` — automatic invocation
+### `registerTrigger()` — automatic triggering
 
-Bind a Function to an event source so it fires automatically when something happens:
+Bind a Function to an event source so it triggers automatically when something happens:
 
 ```typescript
 iii.registerTrigger({
@@ -120,17 +120,17 @@ iii.registerTrigger({
 | `triggerVoid(id, data)` | Nothing | Fire-and-forget, don't block |
 | `registerTrigger()` | n/a | Automatic: HTTP, cron, queue, stream events |
 
-## Cross-language calling
+## Cross-language triggering
 
-A Python worker can call a TypeScript function and vice versa. The engine handles serialization and routing transparently:
+A Python worker can trigger a TypeScript function and vice versa. The engine handles serialization and routing transparently:
 
 ```python
-# Python worker calling a TypeScript function
+# Python worker triggering a TypeScript function
 result = await iii.trigger('math::add', {'a': 2, 'b': 3})
 ```
 
 ```rust
-// Rust worker calling the same function
+// Rust worker triggering the same function
 let result = iii.trigger("math::add", json!({"a": 2, "b": 3})).await?;
 ```
 
@@ -181,7 +181,7 @@ notifications::send
 The `engine::` prefix is reserved for internal engine functions.
 
 <Card icon={<Zap />} title="Triggers" href="/docs/concepts/trigger">
-  Learn all the ways to invoke a Function.
+  Learn all the ways to trigger a Function.
 </Card>
 
 <Card icon={<Code />} title="SDK Reference" href="/docs/api-reference/iii-sdk">
