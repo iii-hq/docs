@@ -1,54 +1,171 @@
 ---
 title: 'Function'
-description: 'Register any functionality with the iii engine and make it available everywhere.'
+description: 'Register any functionality with the iii engine and make it callable from anywhere — any language, any worker.'
 ---
 
-A Function is anything that can receive a request and optionally return a response. Once registered with the iii engine, a Function becomes available from anywhere in the system, regardless of where it lives, what language it's written in, or how it was registered.
-
-```mermaid
-graph LR
-    fn["your code"] --> Register[registerFunction] --> Fn
-    subgraph Eng[Engine]
-        Fn[Function]:::solid
-    end
-    Trigger((trigger)) --> Fn
-    classDef solid stroke-dasharray: 0
-```
+A Function is an async handler identified by a string ID. You write it in any language (TypeScript, Python, Rust), register it with the engine over WebSocket, and it becomes callable from **anywhere** in the system — other workers, other languages, other machines. The engine handles routing, serialization, and delivery.
 
 <Callout title="Everything is a Function" type="info">
-  Existing systems can be incorporated into iii without rewriting them. A legacy API, serverless function, or a simple
-  local function all become the same first-class citizen within the Engine.
+  HTTP endpoints, queue consumers, cron jobs, state operations — they're all Functions under the hood. A legacy API, a serverless function, or a simple local handler all become the same first-class citizen once registered.
 </Callout>
 
-## Registering a Function
+## Register a Function
 
+<Tabs items={["TypeScript", "Python", "Rust"]}>
+<Tab value="TypeScript">
 ```typescript
-import { init } from '@iii-dev/sdk'
+import { init } from 'iii-sdk'
 
-const { registerFunction } = init('ws://engine:8080')
+const iii = init('ws://localhost:49134')
 
-registerFunction(
-  { id: 'users::create' },
+iii.registerFunction(
+  { id: 'users::create', description: 'Create a new user' },
   async (input) => {
     const user = await db.insert(input)
     return { id: user.id, name: user.name }
   }
 )
 ```
+</Tab>
+<Tab value="Python">
+```python
+from iii import III
 
-Once registered, `users::create` can be triggered from any worker, any language, or any module.
+iii = III('ws://localhost:49134')
+
+async def create_user(data):
+    user = await db.insert(data)
+    return {'id': user['id'], 'name': user['name']}
+
+iii.register_function('users::create', create_user)
+await iii.connect()
+```
+</Tab>
+<Tab value="Rust">
+```rust
+use iii::III;
+use serde_json::json;
+
+let iii = III::new("ws://localhost:49134");
+
+iii.register_function("users::create", |input| async move {
+    let user = db::insert(&input).await?;
+    Ok(json!({ "id": user.id, "name": user.name }))
+});
+
+iii.connect().await?;
+```
+</Tab>
+</Tabs>
+
+Once registered, `users::create` is available to the entire system.
+
+## Use a Function
+
+There are three ways to invoke a registered Function:
+
+### `trigger()` — call and get the result
+
+```typescript
+const user = await iii.trigger('users::create', {
+  name: 'Alice',
+  email: 'alice@example.com',
+})
+// user = { id: '...', name: 'Alice' }
+```
+
+### `triggerVoid()` — fire and forget
+
+```typescript
+iii.triggerVoid('notifications::send', {
+  to: 'alice@example.com',
+  message: 'Welcome!',
+})
+// returns immediately, doesn't wait for result
+```
+
+### `registerTrigger()` — automatic invocation
+
+Bind a Function to an event source so it fires automatically when something happens:
+
+```typescript
+iii.registerTrigger({
+  type: 'http',
+  function_id: 'users::create',
+  config: { api_path: '/users', http_method: 'POST' },
+})
+
+// Now POST /users automatically triggers users::create
+```
+
+| Method | Returns | Use when |
+|--------|---------|----------|
+| `trigger(id, data)` | The function's result | You need the response |
+| `triggerVoid(id, data)` | Nothing | Fire-and-forget, don't block |
+| `registerTrigger()` | n/a | Automatic: HTTP, cron, queue, stream events |
+
+## Cross-language calling
+
+A Python worker can call a TypeScript function and vice versa. The engine handles serialization and routing transparently:
+
+```python
+# Python worker calling a TypeScript function
+result = await iii.trigger('users::create', {'name': 'Alice'})
+```
+
+```rust
+// Rust worker calling the same function
+let result = iii.trigger("users::create", json!({"name": "Alice"})).await?;
+```
+
+The caller doesn't know or care what language the target function is written in.
 
 ## Built-in Functions
 
-The iii engine provides built-in Functions through its modules, available automatically without registration:
+The iii engine provides built-in Functions through its modules. These are available automatically — no registration needed:
 
-| Function | Purpose |
-|----------|---------|
-| `enqueue` | Enqueue a message to a topic |
-| `state::set` / `state::get` / `state::list` | Key-value state storage |
-| `stream::set` / `stream::get` / `stream::delete` | Real-time stream data |
-| `log::info` / `log::warn` / `log::error` | Structured logging |
+| Function | Module | Purpose |
+|----------|--------|---------|
+| `enqueue` | Queue | Publish a message to a topic |
+| `state::set` | State | Store a value by scope + key |
+| `state::get` | State | Retrieve a value by scope + key |
+| `state::list` | State | List values in a scope |
+| `state::delete` | State | Delete a value |
+| `stream::set` | Stream | Set data on a real-time stream |
+| `stream::get` | Stream | Get current stream data |
+| `stream::delete` | Stream | Remove stream data |
 
-<Card icon={<Zap />} title="Triggers" href={`/docs/concepts/trigger`}>
-  Learn the three ways to invoke a Function.
+```typescript
+// Using built-in functions — same trigger() API
+await iii.trigger('enqueue', {
+  topic: 'user.created',
+  data: { userId: '123' },
+})
+
+await iii.trigger('state::set', {
+  scope: 'users',
+  key: '123',
+  data: { name: 'Alice' },
+})
+```
+
+## Function IDs
+
+Function IDs use a `namespace::name` convention to organize related functions:
+
+```
+users::create
+users::get
+orders::process-payment
+notifications::send-email
+```
+
+This is a naming convention — the `::` separator has no special meaning to the engine.
+
+<Card icon={<Zap />} title="Triggers" href="/docs/concepts/trigger">
+  Learn all the ways to invoke a Function.
+</Card>
+
+<Card icon={<Code />} title="SDK Reference" href="/docs/api-reference/iii-sdk">
+  Full API reference for registerFunction, trigger, and more.
 </Card>

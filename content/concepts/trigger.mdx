@@ -27,7 +27,7 @@ graph LR
 ### `trigger()`: invoke and await result
 
 ```typescript
-import { init } from '@iii-dev/sdk'
+import { init } from 'iii-sdk'
 
 const { trigger } = init('ws://engine:8080')
 
@@ -40,7 +40,7 @@ const user = await trigger('users::create', {
 ### `triggerVoid()`: fire and forget
 
 ```typescript
-import { init } from '@iii-dev/sdk'
+import { init } from 'iii-sdk'
 
 const { triggerVoid } = init('ws://engine:8080')
 
@@ -55,7 +55,7 @@ triggerVoid('enqueue', {
 Bind a Function to an event source so it fires automatically:
 
 ```typescript
-import { init } from '@iii-dev/sdk'
+import { init } from 'iii-sdk'
 
 const { registerTrigger } = init('ws://engine:8080')
 

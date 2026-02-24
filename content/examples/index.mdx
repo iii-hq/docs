@@ -42,7 +42,7 @@ All three SDKs share the same concepts. The table below shows the equivalent pri
 | Context | `getContext()` | `get_context()` | `iii_sdk::get_context()` |
 | Trigger (sync) | `await iii.trigger(id, data)` | `await iii.trigger(function_id, data)` | `iii.trigger(id, data).await?` |
 | Trigger (fire-and-forget) | `iii.triggerVoid(id, data)` | `iii.trigger_void(function_id, data)` | `iii.trigger_void(id, data)?` |
-| Publish event | `await iii.trigger('queue::enqueue', { topic, data })` | `await iii.trigger("queue::enqueue", {...})` | `iii.trigger_void("queue::enqueue", json!({...}))?` |
+| Publish event | `await iii.trigger('enqueue', { topic, data })` | `await iii.trigger("enqueue", {...})` | `iii.trigger_void("enqueue", json!({...}))?` |
 | State write | `await iii.trigger('state::set', { scope, key, data })` | `await iii.trigger("state::set", {...})` | `iii.trigger_void("state::set", json!({...}))?` |
 | Stream write | `iii.trigger('stream::set', { stream_name, group_id, item_id, data })` | `await iii.trigger("stream::set", {...})` | `streams.update(key, ops).await?` |
 

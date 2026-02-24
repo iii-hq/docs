@@ -29,7 +29,7 @@ iii.registerFunction(
     const ctx = getContext()
     ctx.logger.info('Periodic job fired')
 
-    await iii.trigger('queue::enqueue', {
+    await iii.trigger('enqueue', {
       topic: 'job.tick',
       data: { firedAt: new Date().toISOString(), message: 'Periodic job executed' },
     })
@@ -57,7 +57,7 @@ iii = III(address="ws://localhost:49134", options=InitOptions(worker_name="cron-
 async def periodic_job(_data, ctx) -> None:
     ctx.logger.info("Periodic job fired")
 
-    await iii.trigger("queue::enqueue", {
+    await iii.trigger("enqueue", {
         "topic": "job.tick",
         "data": {
             "firedAt": datetime.now(timezone.utc).isoformat(),
@@ -87,7 +87,7 @@ iii.register_function("cron.periodic_job", |_input| async move {
     let ctx = get_context();
     ctx.logger.info("Periodic job fired", None);
 
-    iii.trigger_void("queue::enqueue", json!({
+    iii.trigger_void("enqueue", json!({
         "topic": "job.tick",
         "data": {
             "firedAt": chrono::Utc::now().to_rfc3339(),
@@ -188,7 +188,7 @@ iii.registerFunction(
       if (!order.complete && new Date() > new Date(order.shipDate)) {
         ctx.logger.warn('Order overdue', { orderId: order.id, shipDate: order.shipDate })
 
-        await iii.trigger('queue::enqueue', {
+        await iii.trigger('enqueue', {
           topic: 'notification',
           data: {
             orderId: order.id,
@@ -236,7 +236,7 @@ async def orders_sweep(_data, ctx) -> None:
         if not complete and datetime.now(timezone.utc) > ship_date:
             ctx.logger.warn("Order overdue", {"orderId": order.get("id")})
 
-            await iii.trigger("queue::enqueue", {
+            await iii.trigger("enqueue", {
                 "topic": "notification",
                 "data": {
                     "orderId": order.get("id"),
@@ -272,7 +272,7 @@ iii.register_function("cron.orders_sweep", |_input| async move {
             if !complete && chrono::Utc::now() > ship_date {
                 ctx.logger.warn("Order overdue", Some(json!({ "orderId": order["id"] })));
 
-                iii.trigger_void("queue::enqueue", json!({
+                iii.trigger_void("enqueue", json!({
                     "topic": "notification",
                     "data": {
                         "orderId": order["id"],

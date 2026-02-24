@@ -253,7 +253,7 @@ iii.registerFunction(
       if (!order.complete && new Date() > new Date(order.shipDate)) {
         ctx.logger.warn('Order overdue', { orderId: order.id })
 
-        await iii.trigger('queue::enqueue', {
+        await iii.trigger('enqueue', {
           topic: 'notification',
           data: { orderId: order.id, templateId: 'order-audit-warning', status: order.status },
         })
@@ -291,7 +291,7 @@ async def orders_audit(_data, ctx) -> None:
         if not complete and datetime.now(timezone.utc) > ship_date:
             ctx.logger.warn("Order overdue", {"orderId": order.get("id")})
 
-            await iii.trigger("queue::enqueue", {
+            await iii.trigger("enqueue", {
                 "topic": "notification",
                 "data": {"orderId": order.get("id"), "templateId": "order-audit-warning"},
             })
@@ -319,7 +319,7 @@ iii.register_function("cron.orders_audit", |_input| async move {
             if !complete && chrono::Utc::now() > ship_date {
                 ctx.logger.warn("Order overdue", Some(json!({ "orderId": order["id"] })));
 
-                iii.trigger_void("queue::enqueue", json!({
+                iii.trigger_void("enqueue", json!({
                     "topic": "notification",
                     "data": { "orderId": order["id"], "templateId": "order-audit-warning" },
                 }))?;

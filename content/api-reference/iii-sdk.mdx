@@ -10,7 +10,7 @@ The SDK connects your application to the iii engine over WebSocket.
 <Tabs items={["TypeScript", "Python", "Rust"]}>
 <Tab value="TypeScript">
 ```typescript
-import { init } from '@iii-dev/sdk'
+import { init } from 'iii-sdk'
 
 const iii = init('ws://localhost:49134', {
   workerName: 'my-worker',
@@ -578,6 +578,6 @@ The SDK exports additional modules for specific functionality:
 
 | Import | Description | Docs |
 |--------|-------------|------|
-| `@iii-dev/sdk/stream` | Stream data types and interfaces | [Stream module](/docs/modules/module-stream) |
-| `@iii-dev/sdk/state` | State management types and interfaces | [State module](/docs/modules/module-state) |
-| `@iii-dev/sdk/telemetry` | OpenTelemetry utilities | [Observability module](/docs/modules/module-observability) |
+| `iii-sdk/stream` | Stream data types and interfaces | [Stream module](/docs/modules/module-stream) |
+| `iii-sdk/state` | State management types and interfaces | [State module](/docs/modules/module-state) |
+| `iii-sdk/telemetry` | OpenTelemetry utilities | [Observability module](/docs/modules/module-observability) |

@@ -28,7 +28,7 @@ modules:
 
 ### 2. Publish to a topic
 
-Use `iii.trigger('queue::enqueue', { topic, data })` to publish a message. The calling function returns immediately — it does not wait for the consumer.
+Use `iii.trigger('enqueue', { topic, data })` to publish a message. The calling function returns immediately — it does not wait for the consumer.
 
 <Tabs items={["TypeScript", "Python", "Rust"]}>
 <Tab value="TypeScript">
@@ -43,7 +43,7 @@ iii.registerFunction(
     const ctx = getContext()
     const order = { id: crypto.randomUUID(), ...req.body }
 
-    await iii.trigger('queue::enqueue', {
+    await iii.trigger('enqueue', {
       topic: 'order.created',
       data: order,
     })
@@ -75,7 +75,7 @@ async def create_order(req):
     ctx = get_context()
     order = {"id": str(uuid.uuid4()), **req["body"]}
 
-    await iii.trigger("queue::enqueue", {
+    await iii.trigger("enqueue", {
         "topic": "order.created",
         "data": order,
     })
@@ -100,7 +100,7 @@ iii.register_function("orders::create", |input| async move {
     let ctx = get_context();
     let order_id = uuid::Uuid::new_v4().to_string();
 
-    iii.trigger_void("queue::enqueue", json!({
+    iii.trigger_void("enqueue", json!({
         "topic": "order.created",
         "data": {
             "id": order_id,
@@ -140,7 +140,7 @@ iii.registerFunction(
     ctx.logger.info('Processing payment', { orderId: id })
     const result = await chargePayment(id, items)
 
-    await iii.trigger('queue::enqueue', {
+    await iii.trigger('enqueue', {
       topic: 'order.paid',
       data: { orderId: id, chargeId: result.chargeId },
     })
@@ -163,7 +163,7 @@ async def process_payment(data):
     ctx.logger.info("Processing payment", {"orderId": order_id})
     result = await charge_payment(order_id, data["items"])
 
-    await iii.trigger("queue::enqueue", {
+    await iii.trigger("enqueue", {
         "topic": "order.paid",
         "data": {"orderId": order_id, "chargeId": result["chargeId"]},
     })
@@ -185,7 +185,7 @@ iii.register_function("orders::process-payment", |input| async move {
     ctx.logger.info("Processing payment", Some(json!({ "orderId": order_id })));
     let result = charge_payment(order_id, &input["items"]).await?;
 
-    iii.trigger_void("queue::enqueue", json!({
+    iii.trigger_void("enqueue", json!({
         "topic": "order.paid",
         "data": { "orderId": order_id, "chargeId": result.charge_id },
     }))?;
@@ -254,7 +254,7 @@ The HTTP endpoint returns `201` immediately. The queue adapter distributes the m
 
 ## Queue vs triggerVoid
 
-| | `queue::enqueue` | `triggerVoid()` |
+| | `enqueue` | `triggerVoid()` |
 |---|---|---|
 | **Decoupling** | Producer doesn't know consumers | Producer must know function ID |
 | **Fan-out** | Multiple consumers per topic | One target function |
