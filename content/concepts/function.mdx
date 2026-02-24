@@ -134,7 +134,7 @@ result = await iii.trigger('math::add', {'a': 2, 'b': 3})
 let result = iii.trigger("math::add", json!({"a": 2, "b": 3})).await?;
 ```
 
-The caller doesn't know or care what language the target function is written in.
+The triggering function doesn't know or care what language the target is written in.
 
 ## Built-in Functions
 
@@ -180,10 +180,11 @@ notifications::send
 
 The `engine::` prefix is reserved for internal engine functions.
 
-<Card icon={<Zap />} title="Triggers" href="/docs/concepts/trigger">
-  Learn all the ways to trigger a Function.
-</Card>
-
-<Card icon={<Code />} title="SDK Reference" href="/docs/api-reference/iii-sdk">
-  Full API reference for registerFunction, trigger, and more.
-</Card>
+<Cards>
+  <Card icon={<Zap />} title="Triggers" href="/docs/concepts/trigger">
+    Learn all the ways to trigger a Function.
+  </Card>
+  <Card icon={<Code />} title="SDK Reference" href="/docs/api-reference/iii-sdk">
+    Full API reference for registerFunction, trigger, and more.
+  </Card>
+</Cards>
