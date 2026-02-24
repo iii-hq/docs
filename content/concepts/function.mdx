@@ -9,6 +9,26 @@ A Function is an async handler identified by a string ID. You write it in any la
   HTTP endpoints, queue consumers, cron jobs, state operations — they're all Functions under the hood. A legacy API, a serverless function, or a simple local handler all become the same first-class citizen once registered.
 </Callout>
 
+```mermaid
+graph LR
+    subgraph W1[Worker A]
+        direction TB
+        F1([Function A])
+        F2([Function B])
+    end
+
+    W1 -- registerFunction --> E[Engine]
+
+    subgraph W2[Worker B]
+        direction TB
+        F3([Function C])
+    end
+
+    W2 -- registerFunction --> E
+
+    F1 -- "trigger(id, data)" --> E -- route --> W2
+```
+
 ## Register a Function
 
 <Tabs items={["TypeScript", "Python", "Rust"]}>
@@ -19,10 +39,9 @@ import { init } from 'iii-sdk'
 const iii = init('ws://localhost:49134')
 
 iii.registerFunction(
-  { id: 'users::create', description: 'Create a new user' },
+  { id: 'math::add', description: 'Add two numbers' },
   async (input) => {
-    const user = await db.insert(input)
-    return { id: user.id, name: user.name }
+    return { result: input.a + input.b }
   }
 )
 ```
@@ -33,11 +52,10 @@ from iii import III
 
 iii = III('ws://localhost:49134')
 
-async def create_user(data):
-    user = await db.insert(data)
-    return {'id': user['id'], 'name': user['name']}
+async def add(data):
+    return {'result': data['a'] + data['b']}
 
-iii.register_function('users::create', create_user)
+iii.register_function('math::add', add)
 await iii.connect()
 ```
 </Tab>
@@ -48,9 +66,10 @@ use serde_json::json;
 
 let iii = III::new("ws://localhost:49134");
 
-iii.register_function("users::create", |input| async move {
-    let user = db::insert(&input).await?;
-    Ok(json!({ "id": user.id, "name": user.name }))
+iii.register_function("math::add", |input| async move {
+    let a = input["a"].as_i64().unwrap_or(0);
+    let b = input["b"].as_i64().unwrap_or(0);
+    Ok(json!({ "result": a + b }))
 });
 
 iii.connect().await?;
@@ -58,7 +77,7 @@ iii.connect().await?;
 </Tab>
 </Tabs>
 
-Once registered, `users::create` is available to the entire system.
+Once registered, `math::add` is available to the entire system.
 
 ## Use a Function
 
@@ -67,11 +86,8 @@ There are three ways to invoke a registered Function:
 ### `trigger()` — call and get the result
 
 ```typescript
-const user = await iii.trigger('users::create', {
-  name: 'Alice',
-  email: 'alice@example.com',
-})
-// user = { id: '...', name: 'Alice' }
+const result = await iii.trigger('math::add', { a: 2, b: 3 })
+// result = { result: 5 }
 ```
 
 ### `triggerVoid()` — fire and forget
@@ -110,12 +126,12 @@ A Python worker can call a TypeScript function and vice versa. The engine handle
 
 ```python
 # Python worker calling a TypeScript function
-result = await iii.trigger('users::create', {'name': 'Alice'})
+result = await iii.trigger('math::add', {'a': 2, 'b': 3})
 ```
 
 ```rust
 // Rust worker calling the same function
-let result = iii.trigger("users::create", json!({"name": "Alice"})).await?;
+let result = iii.trigger("math::add", json!({"a": 2, "b": 3})).await?;
 ```
 
 The caller doesn't know or care what language the target function is written in.
@@ -134,6 +150,8 @@ The iii engine provides built-in Functions through its modules. These are availa
 | `stream::set` | Stream | Set data on a real-time stream |
 | `stream::get` | Stream | Get current stream data |
 | `stream::delete` | Stream | Remove stream data |
+| `stream::list` | Stream | List entries in a stream |
+| `state::list_groups` | State | List all state scopes |
 
 ```typescript
 // Using built-in functions — same trigger() API
