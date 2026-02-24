@@ -29,8 +29,8 @@ const iii = init('ws://localhost:49134')
 iii.registerFunction(
   { id: 'emails::send-welcome' },
   async (data) => {
-    await sendEmail(data.to, 'Welcome!', data.body)
-    return { sent: true }
+    // send the email
+    return { sent: true, to: data.to }
   }
 )
 ```
@@ -44,8 +44,8 @@ async def main():
     iii = III('ws://localhost:49134')
 
     async def send_welcome(data):
-        await send_email(data['to'], 'Welcome!', data['body'])
-        return {'sent': True}
+        # send the email
+        return {'sent': True, 'to': data['to']}
 
     iii.register_function('emails::send-welcome', send_welcome)
     await iii.connect()
@@ -65,7 +65,7 @@ Use `triggerVoid()` (fire-and-forget) so the calling Function doesn't wait:
 iii.registerFunction(
   { id: 'users::create' },
   async (req) => {
-    const user = await createUser(req.body)
+    const user = { id: crypto.randomUUID(), ...req.body }
 
     iii.triggerVoid('emails::send-welcome', {
       to: user.email,
@@ -80,7 +80,8 @@ iii.registerFunction(
 <Tab value="Python">
 ```python
 async def create_user(req):
-    user = await create_user_in_db(req['body'])
+    import uuid
+    user = {'id': str(uuid.uuid4()), **req['body']}
 
     iii.trigger_void('emails::send-welcome', {
         'to': user['email'],

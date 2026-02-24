@@ -58,7 +58,7 @@ asyncio.run(main())
 iii.registerTrigger({
   type: 'http',
   function_id: 'users::create',
-  config: { method: 'POST', path: '/users' },
+  config: { api_path: '/users', http_method: 'POST' },
 })
 ```
 </Tab>
@@ -67,7 +67,7 @@ iii.registerTrigger({
 iii.register_trigger(
     type='http',
     function_id='users::create',
-    config={'method': 'POST', 'path': '/users'},
+    config={'api_path': '/users', 'http_method': 'POST'},
 )
 ```
 </Tab>

@@ -93,7 +93,7 @@ iii.register_trigger(
 </Tab>
 <Tab value="Rust">
 ```rust
-use iii_sdk::{III, get_context};
+use iii::{III, get_context};
 use serde_json::json;
 
 iii.register_function("orders::create", |input| async move {

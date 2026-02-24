@@ -62,7 +62,7 @@ asyncio.run(main())
 iii.registerTrigger({
   type: 'cron',
   function_id: 'cleanup::expired-sessions',
-  config: { cron: '0 */6 * * *' },
+  config: { expression: '0 */6 * * *' },
 })
 ```
 </Tab>
@@ -71,13 +71,13 @@ iii.registerTrigger({
 iii.register_trigger(
     type='cron',
     function_id='cleanup::expired-sessions',
-    config={'cron': '0 */6 * * *'},
+    config={'expression': '0 */6 * * *'},
 )
 ```
 </Tab>
 </Tabs>
 
-This runs the Function every 6 hours. The `schedule` field uses standard cron syntax.
+This runs the Function every 6 hours. The `expression` field uses standard cron syntax.
 
 ### Common schedules
 
