@@ -9,7 +9,7 @@ This example shows the two-step pattern at the heart of most iii workflows: an *
 ```mermaid
 graph LR
     Client -->|"GET /hello"| HelloHandler
-    HelloHandler -->|"queue::enqueue: greet.process"| ProcessHandler
+    HelloHandler -->|"enqueue: greet.process"| ProcessHandler
     ProcessHandler -->|"state::set"| State[(State)]
 ```
 
@@ -323,12 +323,16 @@ iii.register_trigger("queue", "greet.process", json!({
 
 ## Connect and run
 
+<Callout title="Node.js connects automatically" type="info">
+  The Node SDK establishes the WebSocket connection when you call `init()`. There is no separate `connect()` method. Keep the process alive so the worker stays registered.
+</Callout>
+
 <Tabs items={['TypeScript', 'Python', 'Rust']}>
   <Tab value="TypeScript">
 
 ```typescript
-// Start the worker — connect to engine and keep alive
-await iii.connect()
+// Node SDK connects on init() — keep the process alive
+await new Promise(() => {})
 ```
 
   </Tab>

@@ -4,12 +4,12 @@ description: 'Schedule recurring tasks with cron expressions and fan out work th
 hideCards: true
 ---
 
-The `cron` trigger type fires a registered function on a schedule. The function receives `null` / `None` input — the invocation itself is the signal. Work is typically fanned out by calling `queue::enqueue` to downstream queue handlers.
+The `cron` trigger type fires a registered function on a schedule. The handler receives `{trigger, job_id, scheduled_time, actual_time}` as its payload. Work is typically fanned out by calling `enqueue` to downstream queue handlers.
 
 ```mermaid
 graph LR
     Cron -->|"every minute"| CronFn
-    CronFn -->|"queue::enqueue: job.tick"| JobHandler
+    CronFn -->|"enqueue: job.tick"| JobHandler
     JobHandler -->|"logger.info"| Logs
 ```
 
@@ -81,6 +81,8 @@ iii.register_trigger(
 use iii_sdk::{III, get_context};
 use serde_json::json;
 
+let iii = III::new("ws://127.0.0.1:49134");
+
 iii.register_function("cron.periodic_job", |_input| async move {
     let ctx = get_context();
     ctx.logger.info("Periodic job fired", None);
@@ -99,6 +101,8 @@ iii.register_function("cron.periodic_job", |_input| async move {
 iii.register_trigger("cron", "cron.periodic_job", json!({
     "expression": "* * * * *",
 }))?;
+
+iii.connect().await?;
 ```
 
   </Tab>
@@ -320,6 +324,6 @@ iii uses a six-field extended cron format. The optional leading field is seconds
 
 ## Key concepts
 
-- The cron function receives `null` / `None` input. Never rely on input data in a cron handler.
-- Keep cron handlers lightweight. Use `queue::enqueue` to fan out work to queue handlers that can run in parallel.
+- Cron handlers receive `{trigger, job_id, scheduled_time, actual_time}` as their payload.
+- Keep cron handlers lightweight. Use `enqueue` to fan out work to queue handlers that can run in parallel.
 - Combine `state::list` with cron for periodic sweeps over accumulated data — the state sweep pattern above is the idiomatic approach.

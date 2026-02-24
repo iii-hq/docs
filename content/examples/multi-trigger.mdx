@@ -11,7 +11,7 @@ graph LR
     Client -->|"POST /orders/manual"| Handler
     Queue -->|"topic: order.created"| Handler
     Cron -->|"every minute"| Handler
-    Handler -->|"queue::enqueue: order.processed"| Downstream
+    Handler -->|"enqueue: order.processed"| Downstream
 ```
 
 ## Register one function, three triggers
@@ -293,6 +293,6 @@ iii.register_trigger("http", "my.fn", json!({ "api_path": "events", "http_method
 
 - There is no framework-level `ctx.match()` — distinguish trigger types by inspecting the input shape at runtime.
 - HTTP trigger input always has `path_params`, `query_params`, `body`, and `headers` fields.
-- Queue trigger input is the raw event payload you published with `queue::enqueue`.
+- Queue trigger input is the raw event payload you published with `enqueue`.
 - Cron trigger input is `null` / `None` / `json!(null)` — the invocation itself is the signal.
 - Registering the same `function_id` with multiple triggers is intentional and supported; the engine dispatches independently.
