@@ -1,5 +1,5 @@
 {
   "title": "Primitives",
-  "defaultOpen": true,
+  "defaultOpen": false,
   "pages": ["triggers", "functions", "engine", "workers", "modules", "context"]
 }
