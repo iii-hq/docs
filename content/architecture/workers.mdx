@@ -72,23 +72,17 @@ asyncio.run(main())
 </Tab>
 <Tab value="Rust">
 ```rust
-use iii::III;
+use iii_sdk::III;
 use serde_json::{json, Value};
-use std::sync::Arc;
 
-let iii = Arc::new(III::new("ws://localhost:49134"));
-let iii_clone = iii.clone();
-
-iii.register_function("users::create", move |data: Value| {
-    let iii = iii_clone.clone();
-    async move {
-        let user = json!({ "id": uuid::Uuid::new_v4().to_string(), "email": data["email"] });
-        iii.trigger_void("emails::welcome", json!({"to": user["email"]}))?;
-        Ok(user)
-    }
-});
-
+let iii = III::new("ws://localhost:49134");
 iii.connect().await?;
+
+iii.register_function("users::create", |data: Value| async move {
+    let user = json!({ "id": uuid::Uuid::new_v4().to_string(), "email": data["email"] });
+    iii.trigger_void("emails::welcome", json!({"to": user["email"]}))?;
+    Ok(user)
+});
 ```
 </Tab>
 </Tabs>

@@ -63,7 +63,7 @@ await iii.connect()
 </Tab>
 <Tab value="Rust">
 ```rust
-use iii::III;
+use iii_sdk::III;
 use serde_json::json;
 
 let iii = III::new("ws://localhost:49134");
@@ -112,7 +112,7 @@ iii.triggerVoid('enqueue', {
 
 Bind a Function to an event source. The engine triggers it automatically when the event fires:
 
-<Tabs items={["HTTP", "Cron", "Queue", "State"]}>
+<Tabs items={["HTTP", "Cron", "State"]}>
 <Tab value="HTTP">
 ```typescript
 iii.registerTrigger({
@@ -133,16 +133,6 @@ iii.registerTrigger({
 // triggers reports::generate every hour
 ```
 </Tab>
-<Tab value="Queue">
-```typescript
-iii.registerTrigger({
-  type: 'queue',
-  function_id: 'notifications::send',
-  config: { topic: 'user.created' },
-})
-// triggers notifications::send for each message on user.created
-```
-</Tab>
 <Tab value="State">
 ```typescript
 iii.registerTrigger({
@@ -154,6 +144,10 @@ iii.registerTrigger({
 ```
 </Tab>
 </Tabs>
+
+<Callout type="info" title="Queue uses enqueue">
+  Queue messaging uses `enqueue` — a built-in function, no trigger registration needed: `iii.trigger('enqueue', { topic: 'user.created', data: {...} })`. See the [Queue module](/docs/modules/module-queue) for details.
+</Callout>
 
 `registerTrigger()` returns a handle so you can remove the trigger later:
 
