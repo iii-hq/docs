@@ -13,7 +13,7 @@ When a worker connects, it can see every function registered by every other work
 graph TB
     subgraph Engine
         FR[Function Registry]
-        BF["Built-in Functions\nenqueue, state::set,\nstream::set, ..."]
+        BF["Built-in Functions\nenqueue, state::set, ..."]
     end
 
     subgraph WA[Worker A]
@@ -24,11 +24,11 @@ graph TB
         FB(["payments::charge"])
     end
 
-    WA -- "registers orders::create" --> FR
-    WB -- "discovers orders::create" --> FR
-    WB -- "triggers enqueue" --> BF
-    FR -- "notifies on change" --> WA
-    FR -- "notifies on change" --> WB
+    WA -- "registers" --> FR
+    WB -- "discovers" --> FR
+    WB -- "triggers" --> BF
+    FR -- "notifies" --> WA
+    FR -- "notifies" --> WB
 ```
 
 ## Runtime Discovery APIs
