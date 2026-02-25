@@ -37,7 +37,7 @@ iii.register_trigger(
 </Tab>
 <Tab value="Rust">
 ```rust
-iii.register_trigger("http", &fn_ref.id, json!({
+iii.register_trigger("http", "users.create", json!({
     "api_path": "/users",
     "http_method": "POST"
 }))?;
@@ -125,7 +125,7 @@ Executes functions in response to HTTP requests.
 ```rust
 json!({
     "type": "http",
-    "function_id": fn_ref.id,
+    "function_id": "users.get",
     "config": {
         "api_path": "/users/:id",
         "http_method": "GET"
@@ -190,7 +190,7 @@ Executes functions when events are published to subscribed topics.
 ```rust
 json!({
     "type": "queue",
-    "function_id": fn_ref.id,
+    "function_id": "users.on_created",
     "config": {
         "topic": "user.created"
     }
@@ -248,7 +248,7 @@ Executes functions on a time-based schedule using cron expressions.
 ```rust
 json!({
     "type": "cron",
-    "function_id": fn_ref.id,
+    "function_id": "reports.daily",
     "config": {
         "expression": "0 2 * * *"
     }
@@ -306,7 +306,7 @@ Executes functions when log entries match specified criteria.
 ```rust
 json!({
     "type": "log",
-    "function_id": fn_ref.id,
+    "function_id": "alerts.on_error",
     "config": {
         "level": "error"
     }
@@ -445,7 +445,7 @@ iii.register_trigger(
 </Tab>
 <Tab value="Rust">
 ```rust
-iii.register_trigger("http", &fn_ref.id, json!({
+iii.register_trigger("http", "users.create", json!({
     "api_path": "/users",
     "http_method": "POST"
 }))?;

@@ -355,25 +355,25 @@ scopes = await iii.trigger('state::list_groups', {})
 </Tab>
 <Tab value="Rust">
 ```rust
-iii.call("state::set", json!({
+iii.trigger("state::set", json!({
     "scope": "users",
     "key": "user-123",
     "data": { "name": "Alice", "email": "alice@example.com", "preferences": { "theme": "dark" } }
 })).await?;
 
-let profile = iii.call("state::get", json!({
+let profile = iii.trigger("state::get", json!({
     "scope": "users",
     "key": "user-123"
 })).await?;
 
-iii.call("state::set", json!({
+iii.trigger("state::set", json!({
     "scope": "users",
     "key": "user-123",
     "data": { "name": "Alice", "email": "alice@example.com", "preferences": { "theme": "light" } }
 })).await?;
 
-let all_users = iii.call("state::list", json!({ "scope": "users" })).await?;
-let scopes = iii.call("state::list_groups", json!({})).await?;
+let all_users = iii.trigger("state::list", json!({ "scope": "users" })).await?;
+let scopes = iii.trigger("state::list_groups", json!({})).await?;
 ```
 </Tab>
 </Tabs>

@@ -99,7 +99,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             "timestamp": chrono::Utc::now().timestamp_millis(),
         });
 
-        iii.call("stream::set", json!({
+        iii.trigger("stream::set", json!({
             "stream_name": "chat",
             "group_id": data["roomId"],
             "item_id": message["id"],
@@ -136,7 +136,7 @@ messages = await iii.trigger('stream::list', {
 </Tab>
 <Tab value="Rust">
 ```rust
-let messages = iii.call("stream::list", json!({
+let messages = iii.trigger("stream::list", json!({
     "stream_name": "chat",
     "group_id": "room-123",
 })).await?;

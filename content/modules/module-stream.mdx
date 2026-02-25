@@ -488,25 +488,25 @@ use serde_json::json;
 let iii = III::new("ws://localhost:49134");
 iii.connect().await?;
 
-iii.call("stream::set", json!({
+iii.trigger("stream::set", json!({
     "stream_name": "presence",
     "group_id": "room-1",
     "item_id": "user-123",
     "data": { "name": "Alice", "online": true }
 })).await?;
 
-let user = iii.call("stream::get", json!({
+let user = iii.trigger("stream::get", json!({
     "stream_name": "presence",
     "group_id": "room-1",
     "item_id": "user-123"
 })).await?;
 
-let room_members = iii.call("stream::list", json!({
+let room_members = iii.trigger("stream::list", json!({
     "stream_name": "presence",
     "group_id": "room-1"
 })).await?;
 
-iii.call("stream::delete", json!({
+iii.trigger("stream::delete", json!({
     "stream_name": "presence",
     "group_id": "room-1",
     "item_id": "user-123"
