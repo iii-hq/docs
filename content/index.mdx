@@ -16,7 +16,10 @@ The result of balancing these many necessary systems are delayed delivery, diffi
 transient issues, increased expenses, silo'd domain and systems knowledge, and difficulty with
 onboarding new developers and AI agents.
 
-**iii** (pronounced "three eye") removes these concerns by creating a single integration point
+The key advantage of iii is that it transforms a backend from behaving like a series of
+separate concerns, domains, and services to behaving like one cohesive and interoperable application.
+
+**iii** (pronounced "three eye") does this by creating a single integration point
 for all backend systems which results in a stack that is easy to adapt, to modify, and which
 keeps all historical knowledge in one place (ie. a single config).
 
@@ -32,8 +35,6 @@ Then it's a single process (or set of processes) that handles everything:
 - **Write Functions in any language:** Use TypeScript, Python, or Rust. Mix them freely. Everything is just a Function.
 - **Triggers replace all your infra wiring:** An HTTP request, a cron schedule, a queue message, a state change, a stream event. They all work the same way: a Trigger fires, iii invokes your Function.
 - **Discovery keeps every worker in sync:** When a new function is registered with iii every other part of the stack can use it. Functions can deregister dynamically too allowing for seamless upgrading of production systems. No service registry, and no config files. iii always knows what the entire system can do.
-
-The result: you write business logic as Functions, declare what Triggers them, and iii handles the rest.
 
 <Callout title="Why this matters" type="info">
   React simplified the frontend with Component and Context. iii does the same for the backend with Function, Trigger, and Discovery. One mental model for every backend system.
@@ -52,7 +53,7 @@ curl -fsSL https://install.iii.dev/iii/main/install.sh | sh
 ```
 
 <Callout title="Anonymous telemetry" type="info">
-  iii collects anonymous usage data to help improve the engine. No personal information is collected. To opt out, set the environment variable before running iii: `export III_TELEMETRY_ENABLED=false`
+  iii collects anonymous usage data to help improve the engine. No personal information is collected. To opt out, set this environment variable before running iii: `export III_TELEMETRY_ENABLED=false`
 </Callout>
 
 ### 2. Verify installation
