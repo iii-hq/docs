@@ -34,6 +34,7 @@ graph LR
 ## Registering a Function and Trigger it
 
 Function registration is just passing a function, and an `id` for the function to a register function call.
+Cal
 
 <Tabs items={["TypeScript", "Python", "Rust"]}>
 <Tab value="TypeScript">
@@ -113,18 +114,49 @@ according to internal and external events.
 
 ### `trigger()` — Await the result
 
+<Tabs items={["TypeScript", "Python", "Rust"]}>
+<Tab value="TypeScript">
 ```typescript
 const result = await iii.trigger('math::add', { a: 2, b: 3 })
-console.log(result);
-// result = { result: 5 }
+console.log(result) // { result: 5 }
 ```
+</Tab>
+<Tab value="Python">
+```python
+result = await iii.trigger('math::add', {'a': 2, 'b': 3})
+print(result)  # {'result': 5}
+```
+</Tab>
+<Tab value="Rust">
+```rust
+let result = iii.trigger("math::add", json!({"a": 2, "b": 3})).await?;
+println!("{:?}", result); // {"result": 5}
+```
+</Tab>
+</Tabs>
 
 ### `triggerVoid()` — Fire and forget
 
+<Tabs items={["TypeScript", "Python", "Rust"]}>
+<Tab value="TypeScript">
 ```typescript
-iii.triggerVoid('math::add', {a: 2, b: 3})
+iii.triggerVoid('math::add', { a: 2, b: 3 })
 // returns immediately
 ```
+</Tab>
+<Tab value="Python">
+```python
+iii.trigger_void('math::add', {'a': 2, 'b': 3})
+# returns immediately
+```
+</Tab>
+<Tab value="Rust">
+```rust
+iii.trigger_void("math::add", json!({"a": 2, "b": 3}));
+// returns immediately
+```
+</Tab>
+</Tabs>
 
 ### `registerTrigger()` — Run on an event
 
@@ -191,17 +223,28 @@ t.unregister()
 
 Any worker can trigger any Function regardless of language. The engine handles serialization and routing:
 
+<Tabs items={["TypeScript", "Python", "Rust"]}>
+<Tab value="TypeScript">
+```typescript
+const result = await iii.trigger('math::add', { a: 2, b: 3 })
+console.log(result) // { result: 5 }
+```
+</Tab>
+<Tab value="Python">
 ```python
-# Python worker triggering a TypeScript function
 result = await iii.trigger('math::add', {'a': 2, 'b': 3})
+print(result)  # {'result': 5}
 ```
-
+</Tab>
+<Tab value="Rust">
 ```rust
-// Rust worker triggering the same function
 let result = iii.trigger("math::add", json!({"a": 2, "b": 3})).await?;
+println!("{:?}", result); // {"result": 5}
 ```
+</Tab>
+</Tabs>
 
-The triggering function doesn't know or care what language the target is written in.
+The triggering worker doesn't know or care what language the target is written in.
 
 Once a Function is registered, every other worker in the system can discover and trigger it. See [Discovery](/docs/concepts/discovery) for how this works, including built-in functions the engine provides.
 
