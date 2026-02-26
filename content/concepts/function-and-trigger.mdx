@@ -163,36 +163,113 @@ iii.trigger_void("math::add", json!({"a": 2, "b": 3}));
 
 ### `registerTrigger()` — Run on an event
 
-Bind a Function to an event source. The engine triggers it automatically when the event fires:
+Bind a Function to an event source. The engine triggers it automatically when the event fires. Below are
+examples for common Trigger types: HTTP, Cron, and State.
 
-<Tabs items={["HTTP", "Cron", "State"]}>
-<Tab value="HTTP">
+#### HTTP
+
+<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tab value="Node / TypeScript">
 ```typescript
 iii.registerTrigger({
   type: 'http',
-  function_id: 'math::add',
+  function_id: 'math::work',
   config: { api_path: '/math/add', http_method: 'POST' },
 })
+// runs a heavy math function via http
 ```
 </Tab>
-<Tab value="Cron">
+<Tab value="Python">
+```python
+iii.register_trigger(
+    type="http",
+    function_id="math::work",
+    config={"api_path": "/math/add", "http_method": "POST"},
+)
+# runs a heavy math function via http
+```
+</Tab>
+<Tab value="Rust">
+```rust
+iii.register_trigger(
+    "http",
+    "math::work",
+    json!({ "api_path": "/math/add", "http_method": "POST" }),
+)
+.expect("failed to register http trigger");
+// runs a heavy math function via http
+```
+</Tab>
+</Tabs>
+
+#### Cron
+
+<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tab value="Node / TypeScript">
 ```typescript
 iii.registerTrigger({
   type: 'cron',
-  function_id: 'math::add',
-  config: { expression: '*/30 * * * * * *' }, // iii's cron accepts two extra fields: seconds and years
+  function_id: 'math::aggregation',
+  config: { cron: '0 */30 * * * * *' }, // 7-field cron: seconds minutes hours dom month dow year
 })
-// runs math::add every 30 seconds
+// runs a math aggregation function every 30 minutes
 ```
 </Tab>
-<Tab value="State">
+<Tab value="Python">
+```python
+iii.register_trigger(
+    type="cron",
+    function_id="math::aggregation",
+    config={"cron": "0 */30 * * * * *"},  # 7-field cron: seconds minutes hours dom month dow year
+)
+# runs a math aggregation function every 30 minutes
+```
+</Tab>
+<Tab value="Rust">
+```rust
+iii.register_trigger(
+    "cron",
+    "math::aggregation",
+    json!({ "cron": "0 */30 * * * * *" }), // 7-field cron: seconds minutes hours dom month dow year
+)
+.expect("failed to register cron trigger");
+// runs a math aggregation function every 30 minutes
+```
+</Tab>
+</Tabs>
+
+#### State
+
+<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tab value="Node / TypeScript">
 ```typescript
 iii.registerTrigger({
   type: 'state',
   function_id: 'audit::log',
   config: { scope: 'orders', key: 'status' },
 })
-// triggers audit::log when orders::status changes
+// runs an audit log whenever state updates
+```
+</Tab>
+<Tab value="Python">
+```python
+iii.register_trigger(
+    type="state",
+    function_id="audit::log",
+    config={"scope": "orders", "key": "status"},
+)
+# runs an audit log whenever state updates
+```
+</Tab>
+<Tab value="Rust">
+```rust
+iii.register_trigger(
+    "state",
+    "audit::log",
+    json!({ "scope": "orders", "key": "status" }),
+)
+.expect("failed to register state trigger");
+// runs an audit log whenever state updates
 ```
 </Tab>
 </Tabs>
