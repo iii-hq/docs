@@ -16,8 +16,8 @@ graph LR
 
 ## Multi-step workflow with trace correlation
 
-<Tabs items={['TypeScript', 'Python', 'Rust']}>
-  <Tab value="TypeScript">
+<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+  <Tab value="Node / TypeScript">
 
 ```typescript
 import { init, getContext, type ApiRequest } from 'iii-sdk'
@@ -190,8 +190,8 @@ iii.register_trigger("http", "orders.create", json!({
 
 ## Step 2 — Queue processor
 
-<Tabs items={['TypeScript', 'Python', 'Rust']}>
-  <Tab value="TypeScript">
+<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+  <Tab value="Node / TypeScript">
 
 ```typescript
 iii.registerFunction(
@@ -290,8 +290,8 @@ iii.register_trigger("queue", "order.process", json!({ "topic": "order.process" 
 
 ## Step 3 — Notification
 
-<Tabs items={['TypeScript', 'Python', 'Rust']}>
-  <Tab value="TypeScript">
+<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+  <Tab value="Node / TypeScript">
 
 ```typescript
 iii.registerFunction(
@@ -368,8 +368,8 @@ iii.register_trigger("queue", "order.notify", json!({ "topic": "order.notify" })
 
 ## OpenTelemetry setup
 
-<Tabs items={['TypeScript', 'Python', 'Rust']}>
-  <Tab value="TypeScript">
+<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+  <Tab value="Node / TypeScript">
 
 ```typescript
 // Pass otel config to init()

@@ -19,8 +19,8 @@ modules:
 
 ### 2. Register the background Function
 
-<Tabs items={["TypeScript", "Python", "Rust"]}>
-<Tab value="TypeScript">
+<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tab value="Node / TypeScript">
 ```typescript
 import { init } from 'iii-sdk'
 
@@ -76,8 +76,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 Use `triggerVoid()` (fire-and-forget) so the calling Function doesn't wait:
 
-<Tabs items={["TypeScript", "Python", "Rust"]}>
-<Tab value="TypeScript">
+<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tab value="Node / TypeScript">
 ```typescript
 iii.registerFunction(
   { id: 'users::create' },

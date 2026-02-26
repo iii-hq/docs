@@ -36,8 +36,8 @@ graph LR
 Function registration is just passing a function, and an `id` for the function to a register function call.
 Cal
 
-<Tabs items={["TypeScript", "Python", "Rust"]}>
-<Tab value="TypeScript">
+<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tab value="Node / TypeScript">
 ```typescript
 import { init } from 'iii-sdk';
 
@@ -114,8 +114,8 @@ according to internal and external events.
 
 ### `trigger()` — Await the result
 
-<Tabs items={["TypeScript", "Python", "Rust"]}>
-<Tab value="TypeScript">
+<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tab value="Node / TypeScript">
 ```typescript
 const result = await iii.trigger('math::add', { a: 2, b: 3 })
 console.log(result) // { result: 5 }
@@ -137,8 +137,8 @@ println!("{:?}", result); // {"result": 5}
 
 ### `triggerVoid()` — Fire and forget
 
-<Tabs items={["TypeScript", "Python", "Rust"]}>
-<Tab value="TypeScript">
+<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tab value="Node / TypeScript">
 ```typescript
 iii.triggerVoid('math::add', { a: 2, b: 3 })
 // returns immediately
@@ -223,8 +223,8 @@ t.unregister()
 
 Any worker can trigger any Function regardless of language. The engine handles serialization and routing:
 
-<Tabs items={["TypeScript", "Python", "Rust"]}>
-<Tab value="TypeScript">
+<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tab value="Node / TypeScript">
 ```typescript
 const result = await iii.trigger('math::add', { a: 2, b: 3 })
 console.log(result) // { result: 5 }
