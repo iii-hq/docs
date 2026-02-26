@@ -47,10 +47,10 @@ import { init } from 'iii-sdk';
 const iii = init(process.env.III_BRIDGE_URL ?? 'ws://localhost:49134');
 
 iii.registerFunction(
-  { id: 'math::add', description: 'Add two numbers' },
-  async (input) => {
-    return { result: input.a + input.b };
-  },
+    { id: 'math::add', description: 'Add two numbers' },
+    async (input) => {
+        return { result: input.a + input.b };
+    },
 );
 
 const result = await iii.trigger('math::add', { a: 2, b: 3 });
@@ -172,9 +172,9 @@ examples for common Trigger types: HTTP, Cron, and State.
 <Tab value="Node / TypeScript">
 ```typescript
 iii.registerTrigger({
-  type: 'http',
-  function_id: 'math::work',
-  config: { api_path: '/math/add', http_method: 'POST' },
+    type: 'http',
+    function_id: 'math::work',
+    config: { api_path: '/math/add', http_method: 'POST' },
 })
 // runs a heavy math function via http
 ```
@@ -208,9 +208,9 @@ iii.register_trigger(
 <Tab value="Node / TypeScript">
 ```typescript
 iii.registerTrigger({
-  type: 'cron',
-  function_id: 'math::aggregation',
-  config: { cron: '0 */30 * * * * *' }, // 7-field cron: seconds minutes hours dom month dow year
+    type: 'cron',
+    function_id: 'math::aggregation',
+    config: { cron: '0 */30 * * * * *' }, // 7-field cron: seconds minutes hours dom month dow year
 })
 // runs a math aggregation function every 30 minutes
 ```
@@ -244,9 +244,9 @@ iii.register_trigger(
 <Tab value="Node / TypeScript">
 ```typescript
 iii.registerTrigger({
-  type: 'state',
-  function_id: 'audit::log',
-  config: { scope: 'orders', key: 'status' },
+    type: 'state',
+    function_id: 'audit::log',
+    config: { scope: 'orders', key: 'status' },
 })
 // runs an audit log whenever state updates
 ```
@@ -281,7 +281,11 @@ iii.register_trigger(
 `registerTrigger()` returns a handle so you can remove the trigger later:
 
 ```typescript
-const t = iii.registerTrigger({ type: 'http', function_id: 'fn::id', config: { api_path: '/ping', http_method: 'GET' } })
+const t = iii.registerTrigger({
+    type: 'http',
+    function_id: 'fn::id',
+    config: { api_path: '/ping', http_method: 'GET' }
+})
 t.unregister()
 ```
 
