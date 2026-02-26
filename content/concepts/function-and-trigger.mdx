@@ -3,7 +3,7 @@ title: 'Function & Trigger'
 description: 'Register Functions with the engine and trigger them from anywhere — any language, any worker.'
 ---
 
-A **Function** is anything that can be called to do work it receives input, and optionally returns output.
+A **Function** is anything that can be called to do work; it receives input, and optionally returns output.
 It can exist anywhere be it locally, on cloud, on serverless, or even as a 3rd party HTTP endpoint.
 All functionality deconstructs into the same function. It can mutate state, invoke other functions,
 modify databases, and do anything that a typical function can do. 
@@ -31,17 +31,20 @@ graph LR
     F1 -- registerFunction --> E -- trigger --> W2
 ```
 
-## Registering a Function and Trigger it
+## Registering a Function and Triggering it
 
-Function registration is just passing a function, and an `id` for the function to a register function call.
-Cal
+Function registration is just passing a function, and an `id` for the function to `registerFunction(id, func)`
+(or the equivalent in other languages). These functions can then be Triggered from anywhere else in the
+application, and across language and service boundaries. Read more on that in the [Cross-language Triggering](#cross-language-triggering) section below.
+
+Once registered, `math::add` is triggerable from anywhere in the system.
 
 <Tabs items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 import { init } from 'iii-sdk';
 
-const iii = init('ws://localhost:49134');
+const iii = init(process.env.III_BRIDGE_URL ?? 'ws://localhost:49134');
 
 iii.registerFunction(
   { id: 'math::add', description: 'Add two numbers' },
@@ -59,8 +62,9 @@ await iii.shutdown();
 ```python
 from iii import III
 import asyncio
+import os
 
-iii = III('ws://localhost:49134')
+iii = III(os.environ.get('III_BRIDGE_URL', 'ws://localhost:49134'))
 
 async def add(data):
     return {'result': data['a'] + data['b']}
@@ -81,7 +85,8 @@ use serde_json::json;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let iii = III::new("ws://127.0.0.1:49134");
+    let url = std::env::var("III_BRIDGE_URL").unwrap_or_else(|_| "ws://127.0.0.1:49134".to_string());
+    let iii = III::new(&url);
     iii.connect().await?;
 
     iii.register_function("math::add", |input| async move {
@@ -98,8 +103,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 </Tab>
 </Tabs>
 
-Once registered, `math::add` is triggerable from anywhere in the system.
-
 ## Ways to Trigger Functions
 
 As shown above functions can be triggered with `trigger(id, data)` but there are actually
@@ -108,9 +111,9 @@ according to internal and external events.
 
 | Method | Returns | Use when |
 |--------|---------|----------|
-| `trigger(id, data)` | The function's result | You need the result |
-| `triggerVoid(id, data)` | Nothing | Fire-and-forget, don't block |
-| `registerTrigger(config)` | n/a | Event-based: HTTP, cron, queue, state changes, etc. |
+| `trigger(id, data)` | The function's result | You **need** the result |
+| `triggerVoid(id, data)` | Nothing | You **don't need** the result |
+| `registerTrigger(config)` | n/a | You need a function triggered as the result of another event such as: HTTP requests, Cron jobs, Queues, and State changes. |
 
 ### `trigger()` — Await the result
 
@@ -177,9 +180,9 @@ iii.registerTrigger({
 iii.registerTrigger({
   type: 'cron',
   function_id: 'math::add',
-  config: { expression: '0 * * * *' },
+  config: { expression: '*/30 * * * * * *' }, // iii's cron accepts two extra fields: seconds and years
 })
-// triggers reports::generate every hour
+// runs math::add every 30 seconds
 ```
 </Tab>
 <Tab value="State">
@@ -244,7 +247,7 @@ println!("{:?}", result); // {"result": 5}
 </Tab>
 </Tabs>
 
-The triggering worker doesn't know or care what language the target is written in.
+The triggering worker doesn't know what language the target is written in or where it's running.
 
 Once a Function is registered, every other worker in the system can discover and trigger it. See [Discovery](/docs/concepts/discovery) for how this works, including built-in functions the engine provides.
 
