@@ -3,13 +3,13 @@ title: 'Function & Trigger'
 description: 'Register Functions with the engine and trigger them from anywhere — any language, any worker.'
 ---
 
-A **Function** is an async handler identified by a string ID. Register it with the engine over WebSocket and it becomes triggerable from anywhere in the system — other workers, other languages, other machines.
+A **Function** is anything that can be called to do work it receives input, and optionally returns output.
+It can exist anywhere be it locally, on cloud, on serverless, or even as a 3rd party HTTP endpoint.
+All functionality deconstructs into the same function. It can mutate state, invoke other functions,
+modify databases, and do anything that a typical function can do. 
 
-A **Trigger** is what causes a Function to run — either explicitly from code, or automatically from an event source.
-
-<Callout title="Everything is a Function" type="info">
-  HTTP endpoints, queue consumers, cron jobs, state operations — they're all Functions under the hood. Once registered, they're all the same first-class citizen.
-</Callout>
+A **Trigger** is what causes a Function to run — either explicitly from code, or automatically from an event source
+like an HTTP request or cron job.
 
 ```mermaid
 graph LR
@@ -31,34 +31,46 @@ graph LR
     F1 -- registerFunction --> E -- trigger --> W2
 ```
 
-## Register a Function
+## Registering a Function and Trigger it
+
+Function registration is just passing a function, and an `id` for the function to a register function call.
 
 <Tabs items={["TypeScript", "Python", "Rust"]}>
 <Tab value="TypeScript">
 ```typescript
-import { init } from 'iii-sdk'
+import { init } from 'iii-sdk';
 
-const iii = init('ws://localhost:49134')
+const iii = init('ws://localhost:49134');
 
 iii.registerFunction(
   { id: 'math::add', description: 'Add two numbers' },
   async (input) => {
-    return { result: input.a + input.b }
-  }
-)
+    return { result: input.a + input.b };
+  },
+);
+
+const result = await iii.trigger('math::add', { a: 2, b: 3 });
+console.log(result);
+await iii.shutdown();
 ```
 </Tab>
 <Tab value="Python">
 ```python
 from iii import III
+import asyncio
 
 iii = III('ws://localhost:49134')
 
 async def add(data):
     return {'result': data['a'] + data['b']}
 
-iii.register_function('math::add', add)
-await iii.connect()
+async def register():
+    iii.register_function('math::add', add)
+    await iii.connect()
+    result = await iii.trigger('math::add', {'a': 2, 'b': 3})
+    print(result)
+
+asyncio.run(register())
 ```
 </Tab>
 <Tab value="Rust">
@@ -77,9 +89,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Ok(json!({ "result": a + b }))
     });
 
-    loop {
-        tokio::time::sleep(std::time::Duration::from_secs(60)).await;
-    }
+    let result = iii.trigger("math::add", json!({ "a": 2, "b": 3 })).await?;
+    println!("{:?}", result);
+    Ok(())
 }
 ```
 </Tab>
@@ -87,34 +99,34 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 Once registered, `math::add` is triggerable from anywhere in the system.
 
-## Trigger a Function
+## Ways to Trigger Functions
 
-Three ways to trigger a registered Function:
+As shown above functions can be triggered with `trigger(id, data)` but there are actually
+two ways to trigger them and a way to register additional Triggers that fire Functions
+according to internal and external events.
 
 | Method | Returns | Use when |
 |--------|---------|----------|
-| `trigger(id, data)` | The function's result | You need the response |
+| `trigger(id, data)` | The function's result | You need the result |
 | `triggerVoid(id, data)` | Nothing | Fire-and-forget, don't block |
-| `registerTrigger(config)` | n/a | Automatic: HTTP, cron, queue, state changes, etc. |
+| `registerTrigger(config)` | n/a | Event-based: HTTP, cron, queue, state changes, etc. |
 
-### `trigger()` — await the result
+### `trigger()` — Await the result
 
 ```typescript
 const result = await iii.trigger('math::add', { a: 2, b: 3 })
+console.log(result);
 // result = { result: 5 }
 ```
 
-### `triggerVoid()` — fire and forget
+### `triggerVoid()` — Fire and forget
 
 ```typescript
-iii.triggerVoid('enqueue', {
-  topic: 'user.created',
-  data: { userId: '123' },
-})
+iii.triggerVoid('math::add', {a: 2, b: 3})
 // returns immediately
 ```
 
-### `registerTrigger()` — automatic triggering
+### `registerTrigger()` — Run on an event
 
 Bind a Function to an event source. The engine triggers it automatically when the event fires:
 
@@ -123,17 +135,16 @@ Bind a Function to an event source. The engine triggers it automatically when th
 ```typescript
 iii.registerTrigger({
   type: 'http',
-  function_id: 'orders::create',
-  config: { api_path: '/orders', http_method: 'POST' },
+  function_id: 'math::add',
+  config: { api_path: '/math/add', http_method: 'POST' },
 })
-// POST /orders now triggers orders::create
 ```
 </Tab>
 <Tab value="Cron">
 ```typescript
 iii.registerTrigger({
   type: 'cron',
-  function_id: 'reports::generate',
+  function_id: 'math::add',
   config: { expression: '0 * * * *' },
 })
 // triggers reports::generate every hour
