@@ -31,7 +31,7 @@ iii.registerFunction(
   async (data) => {
     const user = { id: crypto.randomUUID(), ...data }
 
-    await iii.trigger('state::set', {
+    iii.triggerVoid('state::set', {
       scope: 'users',
       key: user.id,
       data: user,
@@ -53,7 +53,7 @@ async def main():
     async def create_user(data):
         user = {'id': str(uuid.uuid4()), **data}
 
-        await iii.trigger('state::set', {
+        iii.trigger_void('state::set', {
             'scope': 'users',
             'key': user['id'],
             'data': user,
@@ -83,11 +83,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let mut user = data.clone();
         user["id"] = json!(id);
 
-        iii.trigger("state::set", json!({
+        iii.trigger_void("state::set", json!({
             "scope": "users",
             "key": id,
             "data": user,
-        })).await?;
+        }))?;
 
         Ok(user)
     });
@@ -148,7 +148,7 @@ Use `state::update` with update operations for safe concurrent modifications:
 <Tabs items={["TypeScript", "Python", "Rust"]}>
 <Tab value="TypeScript">
 ```typescript
-await iii.trigger('state::update', {
+iii.triggerVoid('state::update', {
   scope: 'users',
   key: userId,
   ops: [
@@ -160,7 +160,7 @@ await iii.trigger('state::update', {
 </Tab>
 <Tab value="Python">
 ```python
-await iii.trigger('state::update', {
+iii.trigger_void('state::update', {
     'scope': 'users',
     'key': user_id,
     'ops': [
@@ -172,14 +172,14 @@ await iii.trigger('state::update', {
 </Tab>
 <Tab value="Rust">
 ```rust
-iii.trigger("state::update", json!({
+iii.trigger_void("state::update", json!({
     "scope": "users",
     "key": user_id,
     "ops": [
         { "type": "set", "path": "lastLogin", "value": chrono::Utc::now().to_rfc3339() },
         { "type": "increment", "path": "loginCount", "by": 1 },
     ],
-})).await?;
+}))?;
 ```
 </Tab>
 </Tabs>

@@ -152,7 +152,7 @@ iii.registerTrigger({
 </Tabs>
 
 <Callout type="info" title="Queue uses enqueue">
-  Queue messaging uses `enqueue` — a built-in function, no trigger registration needed: `iii.trigger('enqueue', { topic: 'user.created', data: {...} })`. See the [Queue module](/docs/modules/module-queue) for details.
+  Queue messaging uses `enqueue` — a built-in function, no trigger registration needed: `iii.triggerVoid('enqueue', { topic: 'user.created', data: {...} })`. See the [Queue module](/docs/modules/module-queue) for details.
 </Callout>
 
 `registerTrigger()` returns a handle so you can remove the trigger later:

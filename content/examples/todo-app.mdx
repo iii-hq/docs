@@ -421,7 +421,7 @@ iii.registerFunction(
 
     ctx.logger.info('Deleting todo', { todoId })
 
-    await iii.trigger('stream::delete', {
+    iii.triggerVoid('stream::delete', {
       stream_name: 'todo',
       group_id: 'inbox',
       item_id: todoId,
@@ -451,7 +451,7 @@ async def _delete_todo(req: ApiRequest, ctx) -> ApiResponse:
 
     ctx.logger.info("Deleting todo", {"todoId": todo_id})
 
-    await iii.trigger("stream::delete", {
+    iii.trigger_void("stream::delete", {
         "stream_name": "todo", "group_id": "inbox", "item_id": todo_id,
     })
 

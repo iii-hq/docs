@@ -28,7 +28,7 @@ modules:
 
 ### 2. Publish to a topic
 
-Use `iii.trigger('enqueue', { topic, data })` to publish a message. The calling function returns immediately — it does not wait for the consumer.
+Use `iii.triggerVoid('enqueue', { topic, data })` to publish a message. The calling function returns immediately — it does not wait for the consumer.
 
 <Tabs items={["TypeScript", "Python", "Rust"]}>
 <Tab value="TypeScript">
@@ -43,7 +43,7 @@ iii.registerFunction(
     const ctx = getContext()
     const order = { id: crypto.randomUUID(), ...req.body }
 
-    await iii.trigger('enqueue', {
+    iii.triggerVoid('enqueue', {
       topic: 'order.created',
       data: order,
     })
@@ -75,7 +75,7 @@ async def create_order(req):
     ctx = get_context()
     order = {"id": str(uuid.uuid4()), **req["body"]}
 
-    await iii.trigger("enqueue", {
+    iii.trigger_void("enqueue", {
         "topic": "order.created",
         "data": order,
     })
@@ -140,7 +140,7 @@ iii.registerFunction(
     ctx.logger.info('Processing payment', { orderId: id })
     const result = await chargePayment(id, items)
 
-    await iii.trigger('enqueue', {
+    iii.triggerVoid('enqueue', {
       topic: 'order.paid',
       data: { orderId: id, chargeId: result.chargeId },
     })
@@ -163,7 +163,7 @@ async def process_payment(data):
     ctx.logger.info("Processing payment", {"orderId": order_id})
     result = await charge_payment(order_id, data["items"])
 
-    await iii.trigger("enqueue", {
+    iii.trigger_void("enqueue", {
         "topic": "order.paid",
         "data": {"orderId": order_id, "chargeId": result["chargeId"]},
     })

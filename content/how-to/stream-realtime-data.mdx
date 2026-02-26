@@ -37,7 +37,7 @@ iii.registerFunction(
       timestamp: Date.now(),
     }
 
-    await iii.trigger('stream::set', {
+    iii.triggerVoid('stream::set', {
       stream_name: 'chat',
       group_id: data.roomId,
       item_id: message.id,
@@ -65,7 +65,7 @@ async def main():
             'timestamp': int(time.time() * 1000),
         }
 
-        await iii.trigger('stream::set', {
+        iii.trigger_void('stream::set', {
             'stream_name': 'chat',
             'group_id': data['roomId'],
             'item_id': message['id'],
@@ -99,12 +99,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             "timestamp": chrono::Utc::now().timestamp_millis(),
         });
 
-        iii.trigger("stream::set", json!({
+        iii.trigger_void("stream::set", json!({
             "stream_name": "chat",
             "group_id": data["roomId"],
             "item_id": message["id"],
             "data": message,
-        })).await?;
+        }))?;
 
         Ok(message)
     });
