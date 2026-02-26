@@ -99,7 +99,7 @@ iii.registerFunction(
 
     const user = await createUser(data)
 
-    await iii.trigger('state::set', {
+    iii.triggerVoid('state::set', {
       scope: 'users',
       key: user.id,
       data: user,
