@@ -171,7 +171,7 @@ iii.trigger_void('math::add', {'a': 2, 'b': 3})
 </Tab>
 <Tab value="Rust">
 ```rust
-iii.trigger_void("math::add", json!({"a": 2, "b": 3}));
+iii.trigger_void("math::add", json!({"a": 2, "b": 3}))?;
 // returns immediately
 ```
 </Tab>
@@ -266,7 +266,7 @@ iii.registerFunction({ id: 'math::aggregation' }, async () => {
 iii.registerTrigger({
     type: 'cron',
     function_id: 'math::aggregation',
-    config: { cron: '0 */30 * * * *' }, // every 30 minutes
+    config: { expression: '0 */30 * * * *' }, // every 30 minutes
 });
 ```
 </Tab>
@@ -283,7 +283,7 @@ iii.register_function('math::aggregation', aggregation)
 iii.register_trigger(
     type="cron",
     function_id="math::aggregation",
-    config={"cron": "0 */30 * * * *"},  # every 30 minutes
+    config={"expression": "0 */30 * * * *"},  # every 30 minutes
 )
 ```
 </Tab>
@@ -306,7 +306,7 @@ iii.register_function("math::aggregation", move |_| {
 iii.register_trigger(
     "cron",
     "math::aggregation",
-    json!({ "cron": "0 */30 * * * *" }), // every 30 minutes
+    json!({ "expression": "0 */30 * * * *" }), // every 30 minutes
 )?;
 ```
 </Tab>
@@ -357,22 +357,36 @@ iii.register_trigger(
 </Tab>
 <Tab value="Rust">
 ```rust
-iii.register_function("orders::webhook", |event| async move {
-    let client = reqwest::Client::new();
-    let url = std::env::var("WEBHOOK_URL").expect("WEBHOOK_URL required");
-    client.post(&url)
-        .json(&json!({ "order_id": event["key"], "status": event["value"] }))
-        .send()
-        .await
-        .map_err(|e| iii_sdk::IIIError::Other(e.to_string()))?;
-    Ok(json!({}))
-});
+use iii_sdk::III;
+use serde_json::json;
 
-iii.register_trigger(
-    "state",
-    "orders::webhook",
-    json!({ "scope": "orders", "key": "status" }),
-)?;
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let url = std::env::var("III_BRIDGE_URL").unwrap_or_else(|_| "ws://127.0.0.1:49134".to_string());
+    let iii = III::new(&url);
+    iii.connect().await?;
+
+    iii.register_function("orders::webhook", |event| async move {
+        let client = reqwest::Client::new();
+        let url = std::env::var("WEBHOOK_URL").expect("WEBHOOK_URL required");
+        if let Err(e) = client.post(&url)
+            .json(&json!({ "order_id": event["key"], "status": event["value"] }))
+            .send()
+            .await
+        {
+            return Ok(json!({ "error": e.to_string() }));
+        }
+        Ok(json!({}))
+    });
+
+    iii.register_trigger(
+        "state",
+        "orders::webhook",
+        json!({ "scope": "orders", "key": "status" }),
+    )?;
+
+    Ok(())
+}
 ```
 </Tab>
 </Tabs>
@@ -410,11 +424,11 @@ t.unregister()
 </Tab>
 <Tab value="Rust">
 ```rust
-let t = iii.register_trigger(TriggerConfig {
-    trigger_type: "http",
-    function_id: "fn::id",
-    config: json!({"api_path": "/ping", "http_method": "GET"}),
-})?;
+let t = iii.register_trigger(
+    "http",
+    "fn::id",
+    json!({"api_path": "/ping", "http_method": "GET"}),
+)?;
 t.unregister();
 ```
 </Tab>
