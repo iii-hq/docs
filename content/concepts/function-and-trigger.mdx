@@ -1,6 +1,6 @@
 ---
 title: 'Function & Trigger'
-description: 'Register Functions with the engine and trigger them from anywhere — any language, any worker.'
+description: 'Register Functions with the engine and trigger them from anywhere — any language, any service.'
 ---
 
 A **Function** is anything that can be called to do work; it receives input, and optionally returns output.
@@ -436,7 +436,7 @@ t.unregister();
 
 ## Cross-language triggering
 
-Any worker can trigger any Function regardless of language. The engine handles serialization and routing:
+Any Function can be Triggered anywhere regardless of language. The engine handles serialization and routing:
 
 <Tabs items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
@@ -459,9 +459,9 @@ println!("{:?}", result); // {"result": 5}
 </Tab>
 </Tabs>
 
-The triggering worker doesn't know what language the target is written in or where it's running.
+The triggering Function doesn't know what language the target is written in or where it's running.
 
-Once a Function is registered, every other worker in the system can discover and trigger it. See [Discovery](/docs/concepts/discovery) for how this works, including built-in functions the engine provides.
+Once a Function is registered, every other part of the system can discover and trigger it. See [Discovery](/docs/concepts/discovery) for how this works, including built-in functions the engine provides.
 
 ## Function IDs
 
@@ -477,7 +477,7 @@ The `engine::` prefix is reserved for internal engine functions.
 
 <Cards>
   <Card icon={<Search />} title="Discovery" href="/docs/concepts/discovery">
-    How workers discover functions and built-in capabilities at runtime.
+    Learn how functions are discovered by the iii engine.
   </Card>
   <Card icon={<Code />} title="SDK Reference" href="/docs/api-reference/iii-sdk">
     Full API reference for registerFunction, trigger, triggerVoid, and more.
