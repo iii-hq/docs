@@ -8,27 +8,20 @@ This Quickstart will show how any project can leverage iii and the iii SDK to un
 
 ### 1. Create a new quickstart project
 
-<Callout title="iii is in alpha" type="warn">
-  iii is under very active development. We will have a much more streamlined onboarding experience shortly.
-  Make sure to install iii before proceeding:
-
+<Callout title="install iii" type="warn">
+  Make sure to install iii-cli and iii before proceeding:
 ```bash
-curl -fsSL https://install.iii.dev/iii/main/install.sh | sh
+curl -fsSL https://install.iii.dev/iii-cli/main/install.sh | sh
+iii-cli update
 ```
 </Callout>
 
 The project setup will indicate that this project includes TypeScript, Python, and Rust languages. The README contains instructions about using Docker Compose in case not all are available on the system.
 
 ```bash
-curl -LO https://github.com/iii-hq/cli-tooling/releases/latest/download/quickstart.zip
-unzip quickstart.zip
+iii-cli create --template quickstart --directory quickstart
 cd quickstart
 ```
-
-{/* ```bash
-iii-cli create --template quickstart my-iii-backend
-cd my-iii-backend
-``` */}
 
 ### 2. Run the Engine
 
