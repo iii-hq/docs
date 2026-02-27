@@ -1,6 +1,6 @@
 ---
 title: Welcome to iii
-description: A WebSocket-based backend unification and orchestration system.
+description: A backend unification and orchestration system.
 hideCards: true
 ---
 
@@ -33,7 +33,7 @@ iii unifies any backend stack with a single engine and two primitives: **Functio
 Then it's a single process (or set of processes) that handles everything:
 
 - **Write Functions in any language:** Use TypeScript, Python, or Rust. Mix them freely. Everything is just a Function.
-- **Triggers replace all your infra wiring:** An HTTP request, a cron schedule, a queue message, a state change, a stream event. They all work the same way: a Trigger fires, iii invokes your Function.
+- **Triggers handle any event:** An HTTP request, a cron schedule, a queue message, a state change, a stream event. They all work the same way: a Trigger fires, iii invokes your Function.
 - **Discovery keeps everything in sync:** When a new function is registered with iii every other part of the stack can use it. Functions can deregister dynamically too allowing for seamless upgrading of production systems. No service registry, and no config files. iii always knows what the entire system can do.
 
 <Callout title="Why this matters" type="info">
