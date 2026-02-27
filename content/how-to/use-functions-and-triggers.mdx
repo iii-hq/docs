@@ -1,35 +1,7 @@
 ---
-title: 'Function & Trigger'
-description: 'Register Functions with the engine and trigger them from anywhere — any language, any service.'
+title: 'Using Functions & Triggers'
+description: 'Learn how to register Functions and Trigger them from anywhere within your backend across languages and from any service.'
 ---
-
-A **Function** is anything that can be called to do work; it receives input, and optionally returns output.
-It can exist anywhere be it locally, on cloud, on serverless, or even as a 3rd party HTTP endpoint.
-All functionality deconstructs into the same function. It can mutate state, invoke other functions,
-modify databases, and do anything that a typical function can do. 
-
-A **Trigger** is what causes a Function to run — either explicitly from code, or automatically from an event source
-like an HTTP request or cron job.
-
-```mermaid
-graph LR
-    subgraph W1[Worker A]
-        direction TB
-        F1([Function A])
-        F2([Function B])
-    end
-
-    W1 -- "trigger(id, data)" --> E[Engine]
-
-    subgraph W2[Worker B]
-        direction TB
-        F3([Function C])
-    end
-
-    W2 -- registerFunction --> E
-
-    F1 -- registerFunction --> E -- trigger --> W2
-```
 
 ## Registering a Function and Triggering it
 
@@ -476,6 +448,19 @@ The triggering Function doesn't know what language the target is written in or w
 
 Once a Function is registered, every other part of the system can discover and trigger it. See [Discovery](/docs/concepts/discovery) for how this works, including built-in functions the engine provides.
 
+## init, Function, and Trigger Registration is Synchronous
+
+The `init()` call returns immediately rather than returning a Promise. This is intentional.
+Connection establishment happens asynchronously in the background.
+
+This design avoids requiring developers to wrap initialization in an async function or await the SDK before
+registering functions and triggers. Without this, every function and trigger definition would need to
+wait on initialization, adding boilerplate to every file.
+
+The trade-off: if code calls `shutdown()` immediately after `init()`, the connection may not yet
+be established, resulting in an error like `WebSocket was closed before the connection was established`.
+In practice this rarely matters — most applications register functions, respond to triggers, and run indefinitely.
+
 ## Function IDs
 
 Function IDs use a `namespace::name` convention:
@@ -486,16 +471,6 @@ orders::process
 notifications::send
 ```
 
+<Callout title="engine prefix" type="warn">
 The `engine::` prefix is reserved for internal engine functions.
-
-<Cards>
-  <Card icon={<Search />} title="Discovery" href="/docs/concepts/discovery">
-    Learn how functions are discovered by the iii engine.
-  </Card>
-  <Card icon={<Code />} title="SDK Reference" href="/docs/api-reference/iii-sdk">
-    Full API reference for registerFunction, trigger, triggerVoid, and more.
-  </Card>
-  <Card icon={<Terminal />} title="Quickstart" href="/docs/tutorials/quickstart">
-    Start building with Functions and Triggers.
-  </Card>
-</Cards>
+</Callout>
