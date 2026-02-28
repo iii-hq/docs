@@ -17,8 +17,8 @@ graph LR
 
 Every iii worker starts by initialising the SDK and connecting to the engine.
 
-<Tabs items={['TypeScript', 'Python', 'Rust']}>
-  <Tab value="TypeScript">
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
+  <Tab value="Node / TypeScript">
 
 ```typescript
 // worker.ts
@@ -65,8 +65,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 Registers a function and binds it to an HTTP trigger. Returns immediately after publishing to the queue.
 
-<Tabs items={['TypeScript', 'Python', 'Rust']}>
-  <Tab value="TypeScript">
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
+  <Tab value="Node / TypeScript">
 
 ```typescript
 iii.registerFunction(
@@ -202,8 +202,8 @@ iii.register_trigger("http", "hello.api", json!({
 
 Consumes the event, builds the greeting, and persists it to state.
 
-<Tabs items={['TypeScript', 'Python', 'Rust']}>
-  <Tab value="TypeScript">
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
+  <Tab value="Node / TypeScript">
 
 ```typescript
 iii.registerFunction(
@@ -327,8 +327,8 @@ iii.register_trigger("queue", "greet.process", json!({
   The Node SDK establishes the WebSocket connection when you call `init()`. There is no separate `connect()` method. Keep the process alive so the worker stays registered.
 </Callout>
 
-<Tabs items={['TypeScript', 'Python', 'Rust']}>
-  <Tab value="TypeScript">
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
+  <Tab value="Node / TypeScript">
 
 ```typescript
 // Node SDK connects on init() — keep the process alive

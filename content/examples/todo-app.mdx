@@ -18,8 +18,8 @@ graph LR
 
 The iii SDK lets you register a custom stream backed by any storage — in-memory, a database, or a remote service. The engine routes `stream::get` / `stream::set` / `stream::delete` / `stream::list` requests to your implementation.
 
-<Tabs items={['TypeScript', 'Python', 'Rust']}>
-  <Tab value="TypeScript">
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
+  <Tab value="Node / TypeScript">
 
 ```typescript
 // stream.ts
@@ -145,8 +145,8 @@ let streams = Streams::new(iii.clone());
 
 ## Create
 
-<Tabs items={['TypeScript', 'Python', 'Rust']}>
-  <Tab value="TypeScript">
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
+  <Tab value="Node / TypeScript">
 
 ```typescript
 import { getContext, type ApiRequest, type ApiResponse } from 'iii-sdk'
@@ -288,8 +288,8 @@ iii.register_trigger("http", "api.post.todo", json!({
 
 ## Update
 
-<Tabs items={['TypeScript', 'Python', 'Rust']}>
-  <Tab value="TypeScript">
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
+  <Tab value="Node / TypeScript">
 
 ```typescript
 iii.registerFunction(
@@ -405,8 +405,8 @@ iii.register_trigger("http", "api.put.todo", json!({
 
 ## Delete
 
-<Tabs items={['TypeScript', 'Python', 'Rust']}>
-  <Tab value="TypeScript">
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
+  <Tab value="Node / TypeScript">
 
 ```typescript
 iii.registerFunction(

@@ -315,8 +315,8 @@ It's possible to implement a function to handle authentication.
   </ResponseField>
 </Expandable>
 
-<Tabs items={["TypeScript", "Python", "Rust"]}>
-<Tab value="TypeScript">
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
+<Tab value="Node / TypeScript">
 ```typescript
 iii.registerFunction({ id: 'onAuth' }, (input) => ({
   context: { name: 'John Doe' },
@@ -377,8 +377,8 @@ Join and leave triggers receive the same payload shape when invoked.
 
 ### Sample Code
 
-<Tabs items={["TypeScript", "Python", "Rust"]}>
-<Tab value="TypeScript">
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
+<Tab value="Node / TypeScript">
 ```typescript
 const fn = iii.registerFunction({ id: 'onJoin' }, (input) => {
   console.log('Joined stream', input)
@@ -418,8 +418,8 @@ iii.register_trigger("stream:join", "onJoin", json!({}))?;
 
 Streams organize data by `stream_name`, `group_id`, and `item_id`. Use for live presence, collaborative docs, or dashboards:
 
-<Tabs items={["TypeScript", "Python", "Rust"]}>
-<Tab value="TypeScript">
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
+<Tab value="Node / TypeScript">
 ```typescript
 const iii = init('ws://localhost:49134')
 
@@ -536,8 +536,8 @@ Configure the stream module with an auth function:
 
 Register the auth function. Clients may send the token via `Authorization: Bearer <token>` (Node.js) or `Sec-WebSocket-Protocol: Authorization,<token>` (browser stream-client):
 
-<Tabs items={["TypeScript", "Python", "Rust"]}>
-<Tab value="TypeScript">
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
+<Tab value="Node / TypeScript">
 ```typescript
 iii.registerFunction({ id: 'stream::auth' }, (input) => {
   const auth = input.headers?.['authorization']?.replace(/^Bearer\s+/i, '')
@@ -579,8 +579,8 @@ iii.register_function("stream::auth", |input| async move {
 
 Join/leave triggers receive the auth `context`:
 
-<Tabs items={["TypeScript", "Python", "Rust"]}>
-<Tab value="TypeScript">
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
+<Tab value="Node / TypeScript">
 ```typescript
 const fn = iii.registerFunction({ id: 'onJoin' }, (input) => {
   const { stream_name, group_id, id: itemId, context } = input
@@ -628,8 +628,8 @@ iii.register_trigger("stream:join", "onJoin", json!({}))?;
 
 ### Usage Example: Conditional Join
 
-<Tabs items={["TypeScript", "Python", "Rust"]}>
-<Tab value="TypeScript">
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
+<Tab value="Node / TypeScript">
 ```typescript
 const conditionFn = iii.registerFunction(
   { id: 'conditions::requireContext' },
