@@ -18,7 +18,7 @@ graph LR
 
 The iii SDK lets you register a custom stream backed by any storage — in-memory, a database, or a remote service. The engine routes `stream::get` / `stream::set` / `stream::delete` / `stream::list` requests to your implementation.
 
-<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
   <Tab value="Node / TypeScript">
 
 ```typescript
@@ -145,7 +145,7 @@ let streams = Streams::new(iii.clone());
 
 ## Create
 
-<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
   <Tab value="Node / TypeScript">
 
 ```typescript
@@ -288,7 +288,7 @@ iii.register_trigger("http", "api.post.todo", json!({
 
 ## Update
 
-<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
   <Tab value="Node / TypeScript">
 
 ```typescript
@@ -405,7 +405,7 @@ iii.register_trigger("http", "api.put.todo", json!({
 
 ## Delete
 
-<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
   <Tab value="Node / TypeScript">
 
 ```typescript

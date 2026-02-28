@@ -259,7 +259,7 @@ When the trigger fires, the handler receives a state event object:
 
 ### Sample Code
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 const fn = iii.registerFunction(
@@ -312,7 +312,7 @@ iii.register_trigger("state", "state::onUserUpdated", json!({
 
 Store user profiles in state and react when they change:
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 await iii.trigger('state::set', {
@@ -382,7 +382,7 @@ let scopes = iii.trigger("state::list_groups", json!({})).await?;
 
 Only process profile updates when the email field changed:
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 const conditionFn = iii.registerFunction(

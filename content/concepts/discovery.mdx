@@ -30,7 +30,7 @@ Every time a worker connects, disconnects, or registers new functions, the engin
 
 Subscribe to discovery events to react when the system topology changes:
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 iii.onFunctionsAvailable((functions) => {
@@ -58,7 +58,7 @@ iii.on_functions_available(|functions| {
 
 You can also query the current state of the registry at any time:
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 const functions = await iii.listFunctions()

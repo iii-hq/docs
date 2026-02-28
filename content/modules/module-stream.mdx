@@ -315,7 +315,7 @@ It's possible to implement a function to handle authentication.
   </ResponseField>
 </Expandable>
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 iii.registerFunction({ id: 'onAuth' }, (input) => ({
@@ -377,7 +377,7 @@ Join and leave triggers receive the same payload shape when invoked.
 
 ### Sample Code
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 const fn = iii.registerFunction({ id: 'onJoin' }, (input) => {
@@ -418,7 +418,7 @@ iii.register_trigger("stream:join", "onJoin", json!({}))?;
 
 Streams organize data by `stream_name`, `group_id`, and `item_id`. Use for live presence, collaborative docs, or dashboards:
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 const iii = init('ws://localhost:49134')
@@ -536,7 +536,7 @@ Configure the stream module with an auth function:
 
 Register the auth function. Clients may send the token via `Authorization: Bearer <token>` (Node.js) or `Sec-WebSocket-Protocol: Authorization,<token>` (browser stream-client):
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 iii.registerFunction({ id: 'stream::auth' }, (input) => {
@@ -579,7 +579,7 @@ iii.register_function("stream::auth", |input| async move {
 
 Join/leave triggers receive the auth `context`:
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 const fn = iii.registerFunction({ id: 'onJoin' }, (input) => {
@@ -628,7 +628,7 @@ iii.register_trigger("stream:join", "onJoin", json!({}))?;
 
 ### Usage Example: Conditional Join
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 const conditionFn = iii.registerFunction(

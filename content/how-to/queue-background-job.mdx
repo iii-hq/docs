@@ -30,7 +30,7 @@ modules:
 
 Use `iii.trigger('enqueue', { topic, data })` to publish a message. The calling function returns immediately — it does not wait for the consumer.
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 import { init, getContext, type ApiResponse } from 'iii-sdk'
@@ -128,7 +128,7 @@ iii.register_trigger("http", "orders::create", json!({
 
 Register a function and bind it to a `queue` trigger with the same topic. The engine invokes this function whenever a message arrives on that topic.
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 iii.registerFunction(
@@ -204,7 +204,7 @@ iii.register_trigger("queue", "orders::process-payment", json!({
 
 Multiple functions can subscribe to the same topic. When `order.created` fires, both `process-payment` and `send-confirmation` run independently:
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 iii.registerFunction(
@@ -260,7 +260,7 @@ iii.register_trigger("queue", "orders::send-confirmation", json!({
 
 Use `_condition_path` to only invoke the handler when a condition is met:
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 iii.registerFunction(

@@ -19,7 +19,7 @@ modules:
 
 ### 2. Write state from a Function
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 import { init } from 'iii-sdk'
@@ -100,7 +100,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ### 3. Read state from another Function
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 iii.registerFunction(
@@ -145,7 +145,7 @@ iii.register_function("users::get", |data| async move {
 
 Use `state::update` with update operations for safe concurrent modifications:
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 await iii.trigger('state::update', {

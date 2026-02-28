@@ -17,7 +17,7 @@ graph LR
 
 ## Writing state
 
-<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
   <Tab value="Node / TypeScript">
 
 ```typescript
@@ -140,7 +140,7 @@ iii.register_trigger("http", "users.update_status", json!({
 
 ## Reading state
 
-<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
   <Tab value="Node / TypeScript">
 
 ```typescript
@@ -235,7 +235,7 @@ iii.register_trigger("http", "users.get_status", json!({
 
 `state::list` returns all keys in a scope — useful in cron jobs that sweep over accumulated data.
 
-<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
   <Tab value="Node / TypeScript">
 
 ```typescript

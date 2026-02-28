@@ -13,7 +13,7 @@ A trigger consists of three parts:
 2. **Configuration**: Type-specific settings (path, schedule, topics)
 3. **Function ID**: The function to invoke when triggered
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 iii.registerTrigger({
@@ -96,7 +96,7 @@ Executes functions in response to HTTP requests.
 
 **Configuration:**
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 {
@@ -163,7 +163,7 @@ Executes functions when events are published to subscribed topics.
 
 **Configuration:**
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 {
@@ -221,7 +221,7 @@ Executes functions on a time-based schedule using cron expressions.
 
 **Configuration:**
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 {
@@ -279,7 +279,7 @@ Executes functions when log entries match specified criteria.
 
 **Configuration:**
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 {
@@ -392,7 +392,7 @@ sequenceDiagram
 
 First, register the function that will be invoked:
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 const fn = iii.registerFunction({ id: 'users.create' }, async (data) => {
@@ -421,7 +421,7 @@ iii.register_function("users.create", |data: Value| async move {
 
 Then, register a trigger that routes to that function:
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 iii.registerTrigger({
@@ -477,7 +477,7 @@ sequenceDiagram
 
 A single function can have multiple triggers:
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 const fn = iii.registerFunction({ id: 'users.notify' }, async (data) => {
@@ -568,7 +568,7 @@ Triggers can optionally use a **condition function** to decide whether the handl
 
 ### Example: HTTP Trigger with Condition
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 const conditionFn = iii.registerFunction(
@@ -637,7 +637,7 @@ iii.register_trigger("http", "api::verifiedOnly", json!({
 
 ### Example: Queue Trigger with Condition
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 const conditionFn = iii.registerFunction(
@@ -705,7 +705,7 @@ iii.register_trigger("queue", "orders::processHighValue", json!({
 
 ### Example: State Trigger with Condition
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 const conditionFn = iii.registerFunction(
@@ -813,7 +813,7 @@ trigger.unregister()
 
 ### Webhook Handler
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 const fn = iii.registerFunction({ id: 'webhooks.github' }, async (req) => {
@@ -878,7 +878,7 @@ iii.register_trigger("http", "webhooks.github", json!({
 
 ### Event Chain
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 const processFn = iii.registerFunction({ id: 'orders.process' }, async (order) => {
@@ -964,7 +964,7 @@ iii.register_trigger("queue", "orders.sendConfirmation", json!({
 
 ### Scheduled Cleanup
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 const fn = iii.registerFunction({ id: 'maintenance.cleanup' }, async () => {

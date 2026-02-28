@@ -16,7 +16,7 @@ graph LR
 
 ## Multi-step workflow with trace correlation
 
-<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
   <Tab value="Node / TypeScript">
 
 ```typescript
@@ -190,7 +190,7 @@ iii.register_trigger("http", "orders.create", json!({
 
 ## Step 2 — Queue processor
 
-<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
   <Tab value="Node / TypeScript">
 
 ```typescript
@@ -290,7 +290,7 @@ iii.register_trigger("queue", "order.process", json!({ "topic": "order.process" 
 
 ## Step 3 — Notification
 
-<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
   <Tab value="Node / TypeScript">
 
 ```typescript
@@ -368,7 +368,7 @@ iii.register_trigger("queue", "order.notify", json!({ "topic": "order.notify" })
 
 ## OpenTelemetry setup
 
-<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
   <Tab value="Node / TypeScript">
 
 ```typescript

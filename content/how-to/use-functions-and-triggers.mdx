@@ -12,7 +12,7 @@ application, and across language and service boundaries. Read more on that in th
 Once registered, `math::add` is triggerable from anywhere in the system. This example also stores
 each result in state so it can be aggregated later by a cron job.
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 import { init } from 'iii-sdk';
@@ -104,7 +104,7 @@ according to internal and external events.
 
 ### `trigger()` — Await the result
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 const result = await iii.trigger('math::add', { a: 2, b: 3 })
@@ -127,7 +127,7 @@ println!("{:?}", result); // {"result": 5}
 
 ### `triggerVoid()` — Fire and forget
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 iii.triggerVoid('math::add', { a: 2, b: 3 })
@@ -161,7 +161,7 @@ The handler returns an `ApiResponse` with `status_code`, `body`, and optional `h
 {/* TODO: Replace the wrapper functions below with the new native way to register http endpoints as triggerable
 functions once that functionality is available. */}
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 iii.registerFunction({ id: 'math::multiply' }, async (req) => {
@@ -224,7 +224,7 @@ iii.register_trigger(
 
 This example aggregates all stored math results (from `math::add` above) every 30 minutes.
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 iii.registerFunction({ id: 'math::aggregation' }, async () => {
@@ -288,7 +288,7 @@ iii.register_trigger(
 State triggers fire when a value in state changes. This example posts to an external webhook
 whenever an order's status is updated.
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 iii.registerFunction({ id: 'orders::webhook' }, async (event) => {
@@ -372,7 +372,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 `registerTrigger()` returns a handle so you can remove the trigger later:
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 const t = iii.registerTrigger({
@@ -423,7 +423,7 @@ t.unregister();
 
 Any Function can be Triggered anywhere regardless of language. The engine handles serialization and routing:
 
-<Tabs items={["Node / TypeScript", "Python", "Rust"]}>
+<Tabs groupId="language" persist items={["Node / TypeScript", "Python", "Rust"]}>
 <Tab value="Node / TypeScript">
 ```typescript
 const result = await iii.trigger('math::add', { a: 2, b: 3 })

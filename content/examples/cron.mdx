@@ -15,7 +15,7 @@ graph LR
 
 ## Minimal cron function
 
-<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
   <Tab value="Node / TypeScript">
 
 ```typescript
@@ -112,7 +112,7 @@ iii.connect().await?;
 
 The function that consumes the cron's emitted event:
 
-<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
   <Tab value="Node / TypeScript">
 
 ```typescript
@@ -166,7 +166,7 @@ iii.register_trigger("queue", "job.handle_tick", json!({ "topic": "job.tick" }))
 
 A common pattern: read all records in a state scope, filter them by a business rule, and emit events for those that need action.
 
-<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
   <Tab value="Node / TypeScript">
 
 ```typescript

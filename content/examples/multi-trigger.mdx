@@ -16,7 +16,7 @@ graph LR
 
 ## Register one function, three triggers
 
-<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
   <Tab value="Node / TypeScript">
 
 ```typescript
@@ -262,7 +262,7 @@ iii.register_trigger("cron", "orders.handle", json!({ "expression": "* * * * *" 
 
 When you only need two trigger types, the pattern is identical — just skip the third `registerTrigger` call.
 
-<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
   <Tab value="Node / TypeScript">
 
 ```typescript

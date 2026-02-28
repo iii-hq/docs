@@ -343,7 +343,7 @@ req.query_params  # {"status": "active"}
 <ResponseField name="status_code" type="int / number">
   HTTP status code.
 
-<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
   <Tab value="Node / TypeScript">
 
 ```typescript
@@ -398,7 +398,7 @@ Custom stream implementations override the default engine behavior for a given s
   <Accordion title="Type Safety">
     Use typed request/response models for better IDE support and fewer runtime errors.
 
-    <Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+    <Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
       <Tab value="Node / TypeScript">
 
 ```typescript
@@ -456,7 +456,7 @@ iii.register_function("handler", |input| async move {
   <Accordion title="Graceful Shutdown">
     Implement proper shutdown to flush telemetry and clean up resources.
 
-    <Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+    <Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
       <Tab value="Node / TypeScript">
 
 ```typescript

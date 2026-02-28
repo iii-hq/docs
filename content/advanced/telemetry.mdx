@@ -32,7 +32,7 @@ const iii = init('ws://localhost:49134', {
 
 ## Configuration
 
-<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
   <Tab value="Node / TypeScript">
 
 ```typescript
@@ -114,7 +114,7 @@ sequenceDiagram
 
 Use `withSpan` to create custom spans within a function handler:
 
-<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
   <Tab value="Node / TypeScript">
 
 ```typescript
@@ -167,7 +167,7 @@ iii.register_function("orders::process", |input| async move {
 
 Worker metrics (CPU, memory, event loop latency) are reported via `WorkerMetricsCollector`. Metrics reporting is enabled by default through the `enableMetricsReporting: true` option.
 
-<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
   <Tab value="Node / TypeScript">
 
 ```typescript
@@ -213,7 +213,7 @@ The following metrics are collected automatically:
 
 Subscribe to OpenTelemetry log events from the engine using `onLog()`. Logs include severity level, body text, and resource attributes.
 
-<Tabs items={['Node / TypeScript', 'Python', 'Rust']}>
+<Tabs groupId="language" persist items={['Node / TypeScript', 'Python', 'Rust']}>
   <Tab value="Node / TypeScript">
 
 ```typescript
