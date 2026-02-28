@@ -13,8 +13,16 @@ Offload slow or unreliable work (sending emails, processing images, calling exte
 
 ```yaml
 modules:
-  queue:
-    adapter: memory
+  - class: modules::queue::QueueModule
+    config:
+      adapter:
+        class: modules::queue::BuiltinQueueAdapter
+        config:
+          store_method: in_memory  # Options: in_memory, file_based
+          # file_path: ./data/queue_store  # required for file_based
+        # class: modules::queue::RedisAdapter
+        # config:
+        #   redis_url: redis://localhost:6379
 ```
 
 ### 2. Register the background Function
@@ -37,16 +45,24 @@ iii.registerFunction(
 <Tab value="Python">
 ```python
 import asyncio
+import os
+import signal
 from iii import III
 
+iii = III(os.environ.get('III_BRIDGE_URL', 'ws://localhost:49134'))
+
+async def send_welcome(data):
+    return {'sent': True, 'to': data['to']}
+
+iii.register_function('emails::send-welcome', send_welcome)
+
 async def main():
-    iii = III('ws://localhost:49134')
-
-    async def send_welcome(data):
-        return {'sent': True, 'to': data['to']}
-
-    iii.register_function('emails::send-welcome', send_welcome)
     await iii.connect()
+    stop = asyncio.Event()
+    loop = asyncio.get_running_loop()
+    for sig in (signal.SIGINT, signal.SIGTERM):
+        loop.add_signal_handler(sig, stop.set)
+    await stop.wait()
 
 asyncio.run(main())
 ```
@@ -55,10 +71,12 @@ asyncio.run(main())
 ```rust
 use iii_sdk::III;
 use serde_json::json;
+use tokio::signal;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let iii = III::new("ws://127.0.0.1:49134");
+    let url = std::env::var("III_BRIDGE_URL").unwrap_or_else(|_| "ws://127.0.0.1:49134".to_string());
+    let iii = III::new(&url);
     iii.connect().await?;
 
     iii.register_function("emails::send-welcome", |data| async move {
@@ -66,7 +84,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Ok(json!({ "sent": true, "to": to }))
     });
 
-    loop { tokio::time::sleep(std::time::Duration::from_secs(60)).await; }
+    signal::ctrl_c().await?;
+    Ok(())
 }
 ```
 </Tab>
@@ -117,10 +136,10 @@ iii.register_function("users::create", |req| async move {
     let email = req["body"]["email"].as_str().unwrap_or("");
     let name = req["body"]["name"].as_str().unwrap_or("");
 
-    iii.call_void("emails::send-welcome", json!({
+    iii.trigger_void("emails::send-welcome", json!({
         "to": email,
         "body": format!("Hi {}, welcome!", name),
-    }));
+    })).await?;
 
     Ok(json!({ "status_code": 201, "body": { "id": user_id, "name": name, "email": email } }))
 });

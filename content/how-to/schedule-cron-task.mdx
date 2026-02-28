@@ -13,7 +13,10 @@ Run a Function at regular intervals (cleanup jobs, report generation, health che
 
 ```yaml
 modules:
-  cron: {}
+  - class: modules::cron::CronModule
+    config:
+      adapter:
+        class: modules::cron::KvCronAdapter
 ```
 
 ### 2. Register the Function
@@ -37,17 +40,25 @@ iii.registerFunction(
 <Tab value="Python">
 ```python
 import asyncio
+import os
+import signal
 from iii import III
 
+iii = III(os.environ.get('III_BRIDGE_URL', 'ws://localhost:49134'))
+
+async def cleanup_sessions():
+    count = await delete_expired_sessions()
+    return {'deleted': count}
+
+iii.register_function('cleanup::expired-sessions', cleanup_sessions)
+
 async def main():
-    iii = III('ws://localhost:49134')
-
-    async def cleanup_sessions():
-        count = await delete_expired_sessions()
-        return {'deleted': count}
-
-    iii.register_function('cleanup::expired-sessions', cleanup_sessions)
     await iii.connect()
+    stop = asyncio.Event()
+    loop = asyncio.get_running_loop()
+    for sig in (signal.SIGINT, signal.SIGTERM):
+        loop.add_signal_handler(sig, stop.set)
+    await stop.wait()
 
 asyncio.run(main())
 ```
@@ -56,10 +67,12 @@ asyncio.run(main())
 ```rust
 use iii_sdk::III;
 use serde_json::json;
+use tokio::signal;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let iii = III::new("ws://127.0.0.1:49134");
+    let url = std::env::var("III_BRIDGE_URL").unwrap_or_else(|_| "ws://127.0.0.1:49134".to_string());
+    let iii = III::new(&url);
     iii.connect().await?;
 
     iii.register_function("cleanup::expired-sessions", |_| async move {
@@ -67,7 +80,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Ok(json!({ "deleted": count }))
     });
 
-    loop { tokio::time::sleep(std::time::Duration::from_secs(60)).await; }
+    signal::ctrl_c().await?;
+    Ok(())
 }
 ```
 </Tab>
@@ -88,9 +102,9 @@ iii.registerTrigger({
 <Tab value="Python">
 ```python
 iii.register_trigger(
-    type='cron',
-    function_id='cleanup::expired-sessions',
-    config={'expression': '0 */6 * * *'},
+    type="cron",
+    function_id="cleanup::expired-sessions",
+    config={"expression": "0 */6 * * *"},
 )
 ```
 </Tab>

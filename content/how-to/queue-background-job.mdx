@@ -24,6 +24,12 @@ modules:
     config:
       adapter:
         class: modules::queue::BuiltinQueueAdapter
+        config:
+          store_method: in_memory  # Options: in_memory, file_based
+          # file_path: ./data/queue_store  # required for file_based
+        # class: modules::queue::RedisAdapter
+        # config:
+        #   redis_url: redis://localhost:6379
 ```
 
 ### 2. Publish to a topic
@@ -63,13 +69,12 @@ iii.registerTrigger({
 <Tab value="Python">
 ```python
 import asyncio
+import os
+import signal
 import uuid
-from iii import III, InitOptions, ApiRequest, ApiResponse, get_context
+from iii import III, get_context
 
-iii = III(
-    address="ws://localhost:49134",
-    options=InitOptions(worker_name="order-worker"),
-)
+iii = III(os.environ.get('III_BRIDGE_URL', 'ws://localhost:49134'))
 
 async def create_order(req):
     ctx = get_context()
@@ -89,37 +94,60 @@ iii.register_trigger(
     function_id="orders::create",
     config={"api_path": "orders", "http_method": "POST"},
 )
+
+async def main():
+    await iii.connect()
+    stop = asyncio.Event()
+    loop = asyncio.get_running_loop()
+    for sig in (signal.SIGINT, signal.SIGTERM):
+        loop.add_signal_handler(sig, stop.set)
+    await stop.wait()
+
+asyncio.run(main())
 ```
 </Tab>
 <Tab value="Rust">
 ```rust
 use iii_sdk::{III, get_context};
 use serde_json::json;
+use tokio::signal;
 
-iii.register_function("orders::create", |input| async move {
-    let ctx = get_context();
-    let order_id = uuid::Uuid::new_v4().to_string();
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let url = std::env::var("III_BRIDGE_URL").unwrap_or_else(|_| "ws://127.0.0.1:49134".to_string());
+    let iii = III::new(&url);
+    iii.connect().await?;
 
-    iii.trigger_void("enqueue", json!({
-        "topic": "order.created",
-        "data": {
-            "id": order_id,
-            "items": input["body"]["items"],
-        },
+    iii.register_function("orders::create", |input| async move {
+        let ctx = get_context();
+        let order_id = uuid::Uuid::new_v4().to_string();
+
+        iii.trigger_void("enqueue", json!({
+            "topic": "order.created",
+            "data": {
+                "id": order_id,
+                "items": input["body"]["items"],
+            },
+        })).await?;
+
+        ctx.logger.info("Order enqueued", Some(json!({ "orderId": order_id })));
+
+        Ok(json!({
+            "status_code": 201,
+            "body": { "id": order_id, "status": "processing" },
+        }))
+    });
+
+    iii.register_trigger("http", "orders::create", json!({
+        "api_path": "orders",
+        "http_method": "POST",
     }))?;
 
-    ctx.logger.info("Order enqueued", Some(json!({ "orderId": order_id })));
+    // Steps 3–5 add more register_function and register_trigger calls here
 
-    Ok(json!({
-        "status_code": 201,
-        "body": { "id": order_id, "status": "processing" },
-    }))
-});
-
-iii.register_trigger("http", "orders::create", json!({
-    "api_path": "orders",
-    "http_method": "POST",
-}))?;
+    signal::ctrl_c().await?;
+    Ok(())
+}
 ```
 </Tab>
 </Tabs>
@@ -188,7 +216,7 @@ iii.register_function("orders::process-payment", |input| async move {
     iii.trigger_void("enqueue", json!({
         "topic": "order.paid",
         "data": { "orderId": order_id, "chargeId": result.charge_id },
-    }))?;
+    })).await?;
 
     Ok(json!(null))
 });
@@ -233,9 +261,9 @@ async def send_confirmation(data):
 iii.register_function('orders::send-confirmation', send_confirmation)
 
 iii.register_trigger(
-    type='queue',
-    function_id='orders::send-confirmation',
-    config={'topic': 'order.created'},
+    type="queue",
+    function_id="orders::send-confirmation",
+    config={"topic": "order.created"},
 )
 ```
 </Tab>
@@ -297,11 +325,11 @@ iii.register_function('orders::high-value-alert', high_value_alert)
 iii.register_function('orders::is-high-value', is_high_value)
 
 iii.register_trigger(
-    type='queue',
-    function_id='orders::high-value-alert',
+    type="queue",
+    function_id="orders::high-value-alert",
     config={
-        'topic': 'order.created',
-        '_condition_path': 'orders::is-high-value',
+        "topic": "order.created",
+        "_condition_path": "orders::is-high-value",
     },
 )
 ```

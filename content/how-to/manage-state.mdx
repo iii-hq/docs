@@ -13,8 +13,13 @@ Use the State module to share data between Functions without a separate database
 
 ```yaml
 modules:
-  state:
-    adapter: memory
+  - class: modules::state::StateModule
+    config:
+      adapter:
+        class: modules::state::adapters::KvStore
+        config:
+          store_method: in_memory  # Options: in_memory, file_based
+          # file_path: ./data/state_store.db  # required for file_based
 ```
 
 ### 2. Write state from a Function
@@ -34,7 +39,7 @@ iii.registerFunction(
     await iii.trigger('state::set', {
       scope: 'users',
       key: user.id,
-      data: user,
+      value: user,
     })
 
     return user
@@ -44,25 +49,32 @@ iii.registerFunction(
 </Tab>
 <Tab value="Python">
 ```python
-import asyncio, uuid
+import asyncio
+import os
+import signal
+import uuid
 from iii import III
 
+iii = III(os.environ.get('III_BRIDGE_URL', 'ws://localhost:49134'))
+
+async def create_user(data):
+    user = {'id': str(uuid.uuid4()), **data}
+    await iii.trigger('state::set', {
+        'scope': 'users',
+        'key': user['id'],
+        'value': user,
+    })
+    return user
+
+iii.register_function('users::create', create_user)
+
 async def main():
-    iii = III('ws://localhost:49134')
-
-    async def create_user(data):
-        user = {'id': str(uuid.uuid4()), **data}
-
-        await iii.trigger('state::set', {
-            'scope': 'users',
-            'key': user['id'],
-            'data': user,
-        })
-
-        return user
-
-    iii.register_function('users::create', create_user)
     await iii.connect()
+    stop = asyncio.Event()
+    loop = asyncio.get_running_loop()
+    for sig in (signal.SIGINT, signal.SIGTERM):
+        loop.add_signal_handler(sig, stop.set)
+    await stop.wait()
 
 asyncio.run(main())
 ```
@@ -71,11 +83,13 @@ asyncio.run(main())
 ```rust
 use iii_sdk::III;
 use serde_json::json;
+use tokio::signal;
 use uuid::Uuid;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let iii = III::new("ws://127.0.0.1:49134");
+    let url = std::env::var("III_BRIDGE_URL").unwrap_or_else(|_| "ws://127.0.0.1:49134".to_string());
+    let iii = III::new(&url);
     iii.connect().await?;
 
     iii.register_function("users::create", |data| async move {
@@ -86,13 +100,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         iii.trigger("state::set", json!({
             "scope": "users",
             "key": id,
-            "data": user,
+            "value": user,
         })).await?;
 
         Ok(user)
     });
 
-    loop { tokio::time::sleep(std::time::Duration::from_secs(60)).await; }
+    signal::ctrl_c().await?;
+    Ok(())
 }
 ```
 </Tab>
