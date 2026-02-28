@@ -8,6 +8,7 @@
     "queue-background-job",
     "manage-state",
     "schedule-cron-task",
-    "stream-realtime-data"
+    "stream-realtime-data",
+    "disable-telemetry"
   ]
 }
