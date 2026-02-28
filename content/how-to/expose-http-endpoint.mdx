@@ -26,24 +26,38 @@ iii.registerFunction(
     return { status_code: 201, body: user }
   }
 )
+
+// ...place registerTrigger here...
 ```
 </Tab>
 <Tab value="Python">
 ```python
-import asyncio, uuid
+import asyncio
+import signal
+import uuid
+import os
 from iii import III
 
+iii = III(os.environ.get('III_BRIDGE_URL', 'ws://localhost:49134'))
+
+async def create_user(req):
+    name = req['body']['name']
+    email = req['body']['email']
+    user = {'id': str(uuid.uuid4()), 'name': name, 'email': email}
+    return {'status_code': 201, 'body': user}
+
+iii.register_function('users::create', create_user)
+
+# ...place register_trigger here...
+
 async def main():
-    iii = III('ws://localhost:49134')
-
-    async def create_user(req):
-        name = req['body']['name']
-        email = req['body']['email']
-        user = {'id': str(uuid.uuid4()), 'name': name, 'email': email}
-        return {'status_code': 201, 'body': user}
-
-    iii.register_function('users::create', create_user)
     await iii.connect()
+    print("HTTP endpoint ready on POST /users")
+    stop = asyncio.Event()
+    loop = asyncio.get_running_loop()
+    for sig in (signal.SIGINT, signal.SIGTERM):
+        loop.add_signal_handler(sig, stop.set)
+    await stop.wait()
 
 asyncio.run(main())
 ```
@@ -52,10 +66,12 @@ asyncio.run(main())
 ```rust
 use iii_sdk::III;
 use serde_json::json;
+use tokio::signal;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let iii = III::new("ws://127.0.0.1:49134");
+    let url = std::env::var("III_BRIDGE_URL").unwrap_or_else(|_| "ws://127.0.0.1:49134".to_string());
+    let iii = III::new(&url);
     iii.connect().await?;
 
     iii.register_function("users::create", |req| async move {
@@ -67,7 +83,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }))
     });
 
-    loop { tokio::time::sleep(std::time::Duration::from_secs(60)).await; }
+    // ...place register_trigger here...
+
+    println!("HTTP endpoint ready on POST /users");
+    signal::ctrl_c().await?;
+
+    Ok(())
 }
 ```
 </Tab>
@@ -88,18 +109,19 @@ iii.registerTrigger({
 <Tab value="Python">
 ```python
 iii.register_trigger(
-    type='http',
-    function_id='users::create',
-    config={'api_path': '/users', 'http_method': 'POST'},
+    type="http",
+    function_id="users::create",
+    config={"api_path": "/users", "http_method": "POST"},
 )
 ```
 </Tab>
 <Tab value="Rust">
 ```rust
-iii.register_trigger("http", "users::create", json!({
-    "api_path": "/users",
-    "http_method": "POST"
-}))?;
+iii.register_trigger(
+    "http",
+    "users::create",
+    json!({ "api_path": "/users", "http_method": "POST" }),
+)?;
 ```
 </Tab>
 </Tabs>
@@ -109,22 +131,36 @@ iii.register_trigger("http", "users::create", json!({
 Make sure `iii-config.yaml` has the REST API module enabled:
 
 ```yaml
-modules:
-  rest_api:
-    port: 3000
+  - class: modules::api::RestApiModule
+    config:
+      port: 3111
+      host: localhost
+      default_timeout: 30000
+      concurrency_request_limit: 1024
+      cors:
+        allowed_origins:
+          # To allow all origins, use '*':
+          # - '*'
+          - localhost
+        allowed_methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
 ```
 
 ### 4. Test it
 
 ```bash
-curl -X POST http://localhost:3000/users \
+curl -X POST http://localhost:3111/users \
   -H "Content-Type: application/json" \
   -d '{"name": "Alice", "email": "alice@example.com"}'
 ```
 
 ## Result
 
-Your Function is now accessible as `POST /users` on port 3000. The `http` trigger handles request parsing and response serialization automatically.
+Your Function is now accessible as `POST /users` on port 3111. The `http` trigger handles request parsing and response serialization automatically.
 
 <Callout title="Request and Response types" type="info">
   HTTP-triggered Functions receive an `ApiRequest` and should return an `ApiResponse`. See the [SDK Reference](/docs/api-reference/iii-sdk) for type details.
